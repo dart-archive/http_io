@@ -202,7 +202,7 @@ class _HttpHeaders implements HttpHeaders {
     if (values != null) {
       try {
         return HttpDate.parse(values[0]);
-      } on Exception catch (e) {
+      } on Exception {
         return null;
       }
     }
@@ -221,7 +221,7 @@ class _HttpHeaders implements HttpHeaders {
     if (values != null) {
       try {
         return HttpDate.parse(values[0]);
-      } on Exception catch (e) {
+      } on Exception {
         return null;
       }
     }
@@ -240,7 +240,7 @@ class _HttpHeaders implements HttpHeaders {
     if (values != null) {
       try {
         return HttpDate.parse(values[0]);
-      } on Exception catch (e) {
+      } on Exception {
         return null;
       }
     }
@@ -396,7 +396,7 @@ class _HttpHeaders implements HttpHeaders {
         } else {
           try {
             _port = int.parse(value.substring(pos + 1));
-          } on FormatException catch (e) {
+          } on FormatException {
             _port = null;
           }
         }
@@ -871,14 +871,6 @@ class _Cookie implements Cookie {
         index++;
       }
       return s.substring(start, index).trim();
-    }
-
-    void expect(String expected) {
-      if (done()) throw new HttpException("Failed to parse header value [$s]");
-      if (s[index] != expected) {
-        throw new HttpException("Failed to parse header value [$s]");
-      }
-      index++;
     }
 
     void parseAttributes() {

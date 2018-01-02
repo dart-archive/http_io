@@ -15,7 +15,6 @@ import 'dart:collection'
         LinkedListEntry,
         UnmodifiableMapView;
 import 'dart:convert';
-import 'dart:developer' hide log;
 import 'dart:math';
 import 'dart:io';
 import 'dart:typed_data';
@@ -24,9 +23,9 @@ part 'src/crypto.dart';
 part 'src/http_date.dart';
 part 'src/http_headers.dart';
 part 'src/http_impl.dart';
+part 'src/http_overrides.dart';
 part 'src/http_parser.dart';
 part 'src/http_session.dart';
-part 'src/overrides.dart';
 
 /**
  * HTTP status codes.
