@@ -12,7 +12,7 @@ import "package:test/test.dart";
 Future<Null> testDefaultResponseHeaders() {
   checkDefaultHeaders(headers) {
     expect(headers[HttpHeaders.CONTENT_TYPE],
-           equals(['text/plain; charset=utf-8']));
+        equals(['text/plain; charset=utf-8']));
     expect(headers['X-Frame-Options'], equals(['SAMEORIGIN']));
     expect(headers['X-Content-Type-Options'], equals(['nosniff']));
     expect(headers['X-XSS-Protection'], equals(['1; mode=block']));
