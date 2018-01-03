@@ -86,7 +86,7 @@ class _HttpHeaders implements HttpHeaders {
       if (index != -1) {
         values.removeRange(index, index + 1);
       }
-      if (values.length == 0) _headers.remove(name);
+      if (values.isEmpty) _headers.remove(name);
     }
     if (name == HttpHeaders.TRANSFER_ENCODING && value == "chunked") {
       _chunkedTransferEncoding = false;
@@ -104,7 +104,7 @@ class _HttpHeaders implements HttpHeaders {
   }
 
   void noFolding(String name) {
-    if (_noFoldingHeaders == null) _noFoldingHeaders = new List<String>();
+    _noFoldingHeaders ??= new List<String>();
     _noFoldingHeaders.add(name);
   }
 
@@ -618,9 +618,7 @@ class _HeaderValue implements HeaderValue {
   }
 
   static _HeaderValue parse(String value,
-      {parameterSeparator: ";",
-      valueSeparator: null,
-      preserveBackslash: false}) {
+      {parameterSeparator: ";", valueSeparator, preserveBackslash: false}) {
     // Parse the string.
     var result = new _HeaderValue();
     result._parse(value, parameterSeparator, valueSeparator, preserveBackslash);
@@ -630,23 +628,20 @@ class _HeaderValue implements HeaderValue {
   String get value => _value;
 
   void _ensureParameters() {
-    if (_parameters == null) {
-      _parameters = new HashMap<String, String>();
-    }
+    _parameters ??= new HashMap<String, String>();
   }
 
   Map<String, String> get parameters {
     _ensureParameters();
-    if (_unmodifiableParameters == null) {
-      _unmodifiableParameters = new UnmodifiableMapView(_parameters);
-    }
+    _unmodifiableParameters ??= new UnmodifiableMapView(_parameters);
+
     return _unmodifiableParameters;
   }
 
   String toString() {
     StringBuffer sb = new StringBuffer();
     sb.write(_value);
-    if (parameters != null && parameters.length > 0) {
+    if (parameters != null && parameters.isNotEmpty) {
       _parameters.forEach((String name, String value) {
         sb..write("; ")..write(name)..write("=")..write(value);
       });
@@ -783,8 +778,8 @@ class _ContentType extends _HeaderValue implements ContentType {
       : _primaryType = primaryType,
         _subType = subType,
         super("") {
-    if (_primaryType == null) _primaryType = "";
-    if (_subType == null) _subType = "";
+    _primaryType ??= _primaryType = "";
+    _subType ??= "";
     _value = "$_primaryType/$_subType";
     if (parameters != null) {
       _ensureParameters();
@@ -917,7 +912,7 @@ class _Cookie implements Cookie {
     }
 
     name = parseName();
-    if (done() || name.length == 0) {
+    if (done() || name.isEmpty) {
       throw new HttpException("Failed to parse header value [$s]");
     }
     index++; // Skip the = character.

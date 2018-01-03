@@ -264,6 +264,7 @@ class _HttpRequest extends _HttpInboundMessage implements HttpRequest {
         // It's destroyed, clear it.
         _session = null;
         // Create new session object by calling recursive.
+        // ignore: recursive_getters
         return session;
       }
       // It's already mapped, use it.
@@ -751,7 +752,7 @@ abstract class _HttpOutboundMessage<T> extends _IOSinkImpl {
     if (_encodingSet && _outgoing.headersWritten) {
       return _encoding;
     }
-    var charset;
+    String charset;
     if (headers.contentType != null && headers.contentType.charset != null) {
       charset = headers.contentType.charset;
     } else {
@@ -761,7 +762,7 @@ abstract class _HttpOutboundMessage<T> extends _IOSinkImpl {
   }
 
   void add(List<int> data) {
-    if (data.length == 0) return;
+    if (data.isEmpty) return;
     super.add(data);
   }
 
@@ -796,7 +797,7 @@ class _HttpResponse extends _HttpOutboundMessage<HttpResponse>
   bool get _isConnectionClosed => _httpRequest._httpConnection._isClosing;
 
   List<Cookie> get cookies {
-    if (_cookies == null) _cookies = new List<Cookie>();
+    _cookies ??= new List<Cookie>();
     return _cookies;
   }
 
@@ -1023,7 +1024,7 @@ class _HttpClientRequest extends _HttpOutboundMessage<HttpClientResponse>
 
   int _maxRedirects = 5;
 
-  List<RedirectInfo> _responseRedirects = [];
+  final List<RedirectInfo> _responseRedirects = [];
 
   _HttpClientRequest(_HttpOutgoing outgoing, Uri uri, this.method, this._proxy,
       this._httpClient, this._httpClientConnection)
@@ -1038,10 +1039,8 @@ class _HttpClientRequest extends _HttpOutboundMessage<HttpClientResponse>
   }
 
   Future<HttpClientResponse> get done {
-    if (_response == null) {
-      _response = Future.wait([_responseCompleter.future, super.done],
-          eagerError: true).then((list) => list[0]);
-    }
+    _response ??= Future.wait([_responseCompleter.future, super.done],
+        eagerError: true).then((list) => list[0]);
     return _response;
   }
 
@@ -1102,7 +1101,7 @@ class _HttpClientRequest extends _HttpOutboundMessage<HttpClientResponse>
       String result = uri.path;
       if (result.isEmpty) result = "/";
       if (uri.hasQuery) {
-        result = "${result}?${uri.query}";
+        result = "$result?${uri.query}";
       }
       return result;
     }
@@ -1140,7 +1139,7 @@ class _HttpClientRequest extends _HttpOutboundMessage<HttpClientResponse>
     buffer.addByte(_CharCode.LF);
 
     // Add the cookies to the headers.
-    if (!cookies.isEmpty) {
+    if (cookies.isNotEmpty) {
       StringBuffer sb = new StringBuffer();
       for (int i = 0; i < cookies.length; i++) {
         if (i > 0) sb.write("; ");
@@ -1310,7 +1309,7 @@ class _HttpOutgoing implements StreamConsumer<List<int>> {
 
     void onData(List<int> data) {
       if (_socketError) return;
-      if (data.length == 0) return;
+      if (data.isEmpty) return;
       if (chunked) {
         if (_gzip) {
           _gzipAdd = controller.add;
@@ -1660,13 +1659,13 @@ class _HttpClientConnection {
       String auth = _CryptoUtils
           .bytesToBase64(utf8.encode("${proxy.username}:${proxy.password}"));
       request.headers.set(HttpHeaders.PROXY_AUTHORIZATION, "Basic $auth");
-    } else if (!proxy.isDirect && _httpClient._proxyCredentials.length > 0) {
+    } else if (!proxy.isDirect && _httpClient._proxyCredentials.isNotEmpty) {
       proxyCreds = _httpClient._findProxyCredentials(proxy);
       if (proxyCreds != null) {
         proxyCreds.authorize(request);
       }
     }
-    if (uri.userInfo != null && !uri.userInfo.isEmpty) {
+    if (uri.userInfo != null && uri.userInfo.isNotEmpty) {
       // If the URL contains user information use that for basic
       // authorization.
       String auth = _CryptoUtils.bytesToBase64(utf8.encode(uri.userInfo));
@@ -2006,7 +2005,7 @@ class _HttpClient implements HttpClient {
         queryStart = i;
       }
     }
-    String query = null;
+    String query;
     if (queryStart < fragmentStart) {
       query = path.substring(queryStart + 1, fragmentStart);
       path = path.substring(0, queryStart);
@@ -2296,25 +2295,25 @@ class _HttpClient implements HttpClient {
     }
 
     // Default to using the process current environment.
-    if (environment == null) environment = _platformEnvironmentCache;
+    environment ??= _platformEnvironmentCache;
 
     String proxyCfg;
 
     String noProxy = environment["no_proxy"];
-    if (noProxy == null) noProxy = environment["NO_PROXY"];
+    noProxy ??= environment["NO_PROXY"];
     if ((proxyCfg = checkNoProxy(noProxy)) != null) {
       return proxyCfg;
     }
 
     if (url.scheme == "http") {
       String proxy = environment["http_proxy"];
-      if (proxy == null) proxy = environment["HTTP_PROXY"];
+      proxy ??= environment["HTTP_PROXY"];
       if ((proxyCfg = checkProxy(proxy)) != null) {
         return proxyCfg;
       }
     } else if (url.scheme == "https") {
       String proxy = environment["https_proxy"];
-      if (proxy == null) proxy = environment["HTTPS_PROXY"];
+      proxy ??= environment["HTTPS_PROXY"];
       if ((proxyCfg = checkProxy(proxy)) != null) {
         return proxyCfg;
       }
@@ -2322,7 +2321,8 @@ class _HttpClient implements HttpClient {
     return "DIRECT";
   }
 
-  static Map<String, String> _platformEnvironmentCache = Platform.environment;
+  static final Map<String, String> _platformEnvironmentCache =
+      Platform.environment;
 }
 
 class _HttpConnection extends LinkedListEntry<_HttpConnection>
@@ -2333,10 +2333,10 @@ class _HttpConnection extends LinkedListEntry<_HttpConnection>
   static const _DETACHED = 3;
 
   // Use HashMap, as we don't need to keep order.
-  static Map<int, _HttpConnection> _connections =
+  static final Map<int, _HttpConnection> _connections =
       new HashMap<int, _HttpConnection>();
 
-  final /*_ServerSocket*/ _socket;
+  final Socket _socket;
   final _HttpServer _httpServer;
   final _HttpParser _httpParser;
   int _state = _IDLE;
@@ -2449,7 +2449,8 @@ class _HttpConnection extends LinkedListEntry<_HttpConnection>
     }
     r['server'] = _httpServer._toJSON(true);
     try {
-      r['socket'] = _socket._toJSON(true);
+      // TODO(kevmoo): don't rely on SDK implementation!
+      r['socket'] = (_socket as dynamic)._toJSON(true);
     } catch (_) {
       r['socket'] = {
         'id': _servicePath,
@@ -2484,7 +2485,7 @@ class _HttpServer extends Stream<HttpRequest>
     with _ServiceObject
     implements HttpServer {
   // Use default Map so we keep order.
-  static Map<int, _HttpServer> _servers = new Map<int, _HttpServer>();
+  static final Map<int, _HttpServer> _servers = new Map<int, _HttpServer>();
 
   String serverHeader;
   final HttpHeaders defaultResponseHeaders = _initDefaultResponseHeaders();
@@ -2656,9 +2657,7 @@ class _HttpServer extends Stream<HttpRequest>
 
   _HttpSessionManager get _sessionManager {
     // Lazy init.
-    if (_sessionManagerInstance == null) {
-      _sessionManagerInstance = new _HttpSessionManager();
-    }
+    _sessionManagerInstance ??= new _HttpSessionManager();
     return _sessionManagerInstance;
   }
 
@@ -2740,7 +2739,7 @@ class _ProxyConfiguration {
     List<String> list = configuration.split(";");
     list.forEach((String proxy) {
       proxy = proxy.trim();
-      if (!proxy.isEmpty) {
+      if (proxy.isNotEmpty) {
         if (proxy.startsWith(PROXY_PREFIX)) {
           String username;
           String password;

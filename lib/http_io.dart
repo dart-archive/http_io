@@ -15,8 +15,8 @@ import 'dart:collection'
         LinkedListEntry,
         UnmodifiableMapView;
 import 'dart:convert';
-import 'dart:math';
 import 'dart:io';
+import 'dart:math';
 import 'dart:typed_data';
 
 part 'src/crypto.dart';
@@ -151,7 +151,7 @@ abstract class HttpStatus {
  *
  * ## Connect to a server socket
  *
- * You can use the [listenOn] constructor to attach an HTTP server to
+ * You can use the [HttpServer.listenOn] constructor to attach an HTTP server to
  * a [ServerSocket].
  *
  *     import 'dart:io';
@@ -702,7 +702,7 @@ abstract class HeaderValue {
    */
   static HeaderValue parse(String value,
       {String parameterSeparator: ";",
-      String valueSeparator: null,
+      String valueSeparator,
       bool preserveBackslash: false}) {
     return _HeaderValue.parse(value,
         parameterSeparator: parameterSeparator,
@@ -1526,7 +1526,7 @@ abstract class HttpClient {
   /**
    * Sets the function to be called when a site is requesting
    * authentication. The URL requested and the security realm from the
-   * server are passed in the arguments [url] and [realm].
+   * server are passed in the arguments `url` and `realm`.
    *
    * The function returns a [Future] which should complete when the
    * authentication has been resolved. If credentials cannot be
@@ -1548,7 +1548,7 @@ abstract class HttpClient {
 
   /**
    * Sets the function used to resolve the proxy server to be used for
-   * opening a HTTP connection to the specified [url]. If this
+   * opening a HTTP connection to the specified `url`. If this
    * function is not set, direct connections will always be used.
    *
    * The string returned by [f] must be in the format used by browser
@@ -1636,8 +1636,8 @@ abstract class HttpClient {
   /**
    * Sets the function to be called when a proxy is requesting
    * authentication. Information on the proxy in use and the security
-   * realm for the authentication are passed in the arguments [host],
-   * [port] and [realm].
+   * realm for the authentication are passed in the arguments `host`,
+   * `port` and `realm`.
    *
    * The function returns a [Future] which should complete when the
    * authentication has been resolved. If credentials cannot be
