@@ -15,7 +15,26 @@ import 'dart:collection'
         LinkedListEntry,
         UnmodifiableMapView;
 import 'dart:convert';
-import 'dart:io';
+import 'dart:io'
+    show
+        BytesBuilder,
+        GZIP,
+        HandshakeException,
+        InternetAddress,
+        IOException,
+        IOSink,
+        Platform,
+        SecureServerSocket,
+        SecureSocket,
+        SecurityContext,
+        ServerSocket,
+        Socket,
+        SocketException,
+        SocketOption,
+        stderr,
+        TlsException,
+        X509Certificate,
+        ZLibEncoder;
 import 'dart:math';
 import 'dart:typed_data';
 
