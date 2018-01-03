@@ -227,11 +227,11 @@ abstract class _HashBase {
   newInstance();
 
   // One round of the hash computation.
-  _updateHash(List<int> m);
+  void _updateHash(List<int> m);
 
   // Helper methods.
-  _add32(x, y) => (x + y) & _MASK_32;
-  _roundUp(val, n) => (val + n - 1) & -n;
+  int _add32(int x, int y) => (x + y) & _MASK_32;
+  int _roundUp(int val, int n) => (val + n - 1) & -n;
 
   // Rotate left limiting to unsigned 32-bit values.
   int _rotl32(int val, int shift) {

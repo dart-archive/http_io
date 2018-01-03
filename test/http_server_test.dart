@@ -33,7 +33,8 @@ Future<Null> testDefaultResponseHeaders() {
     expect(headers['a'], equals(['b']));
   }
 
-  doTest(bool clearHeaders, Map defaultHeaders, Function checker) {
+  doTest(bool clearHeaders, Map<String, dynamic> defaultHeaders,
+      Function checker) {
     Completer<Null> completer = new Completer();
     HttpServer.bind("127.0.0.1", 0).then((server) {
       if (clearHeaders) server.defaultResponseHeaders.clear();

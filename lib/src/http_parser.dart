@@ -17,7 +17,7 @@ class _Const {
 
   static const bool T = true;
   static const bool F = false;
-  // Loopup-map for the following characters: '()<>@,;:\\"/[]?={} \t'.
+  // Lookup-map for the following characters: '()<>@,;:\\"/[]?={} \t'.
   static const SEPARATOR_MAP = const [
     F, F, F, F, F, F, F, F, F, T, F, F, F, F, F, F, F, F, F, F, F, F, F, F, //
     F, F, F, F, F, F, F, F, T, F, T, F, F, F, F, F, T, T, F, F, T, F, F, T, //
@@ -804,7 +804,7 @@ class _HttpParser extends Stream<_HttpIncoming> {
     }
   }
 
-  void _onData(List<int> buffer) {
+  void _onData(Uint8List buffer) {
     _socketSubscription.pause();
     assert(_buffer == null);
     _buffer = buffer;
@@ -1055,7 +1055,7 @@ class _HttpParser extends Stream<_HttpIncoming> {
     }
   }
 
-  void _reportError(error, [stackTrace]) {
+  void _reportError(Object error, [StackTrace stackTrace]) {
     if (_socketSubscription != null) _socketSubscription.cancel();
     _state = _State.FAILURE;
     _controller.addError(error, stackTrace);

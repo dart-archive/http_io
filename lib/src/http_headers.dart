@@ -594,12 +594,13 @@ class _HttpHeaders implements HttpHeaders {
     return field.toLowerCase();
   }
 
-  static _validateValue(value) {
-    if (value is! String) return value;
-    for (var i = 0; i < value.length; i++) {
-      if (!_HttpParser._isValueChar(value.codeUnitAt(i))) {
-        throw new FormatException(
-            "Invalid HTTP header field value: ${json.encode(value)}");
+  static T _validateValue<T>(T value) {
+    if (value is String) {
+      for (var i = 0; i < value.length; i++) {
+        if (!_HttpParser._isValueChar(value.codeUnitAt(i))) {
+          throw new FormatException(
+              "Invalid HTTP header field value: ${json.encode(value)}");
+        }
       }
     }
     return value;
@@ -618,7 +619,9 @@ class _HeaderValue implements HeaderValue {
   }
 
   static _HeaderValue parse(String value,
-      {parameterSeparator: ";", valueSeparator, preserveBackslash: false}) {
+      {String parameterSeparator: ";",
+      String valueSeparator,
+      bool preserveBackslash: false}) {
     // Parse the string.
     var result = new _HeaderValue();
     result._parse(value, parameterSeparator, valueSeparator, preserveBackslash);
