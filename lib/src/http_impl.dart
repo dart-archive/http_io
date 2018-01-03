@@ -4,30 +4,6 @@
 
 part of http_io;
 
-int _nextServiceId = 1;
-
-// TODO(ajohnsen): Use other way of getting a unique id.
-abstract class _ServiceObject {
-  int __serviceId = 0;
-  int get _serviceId {
-    if (__serviceId == 0) __serviceId = _nextServiceId++;
-    return __serviceId;
-  }
-
-  Map _toJSON(bool ref);
-
-  String get _servicePath => "$_serviceTypePath/$_serviceId";
-
-  String get _serviceTypePath;
-
-  String get _serviceTypeName;
-
-  String _serviceType(bool ref) {
-    if (ref) return "@$_serviceTypeName";
-    return _serviceTypeName;
-  }
-}
-
 class _CopyingBytesBuilder implements BytesBuilder {
   // Start with 1024 bytes.
   static const int _INIT_SIZE = 1024;
@@ -2327,16 +2303,11 @@ class _HttpClient implements HttpClient {
       Platform.environment;
 }
 
-class _HttpConnection extends LinkedListEntry<_HttpConnection>
-    with _ServiceObject {
+class _HttpConnection extends LinkedListEntry<_HttpConnection> {
   static const _ACTIVE = 0;
   static const _IDLE = 1;
   static const _CLOSING = 2;
   static const _DETACHED = 3;
-
-  // Use HashMap, as we don't need to keep order.
-  static final Map<int, _HttpConnection> _connections =
-      new HashMap<int, _HttpConnection>();
 
   final Socket _socket;
   final _HttpServer _httpServer;
@@ -2348,7 +2319,6 @@ class _HttpConnection extends LinkedListEntry<_HttpConnection>
 
   _HttpConnection(this._socket, this._httpServer)
       : _httpParser = new _HttpParser.requestParser() {
-    _connections[_serviceId] = this;
     _httpParser.listenToStream(_socket);
     _subscription = _httpParser.listen((incoming) {
       _httpServer._markActive(this);
@@ -2412,7 +2382,6 @@ class _HttpConnection extends LinkedListEntry<_HttpConnection>
     _state = _CLOSING;
     _socket.destroy();
     _httpServer._connectionClosed(this);
-    _connections.remove(_serviceId);
   }
 
   Future<Socket> detachSocket() {
@@ -2423,7 +2392,6 @@ class _HttpConnection extends LinkedListEntry<_HttpConnection>
     _HttpDetachedIncoming detachedIncoming = _httpParser.detachIncoming();
 
     return _streamFuture.then((_) {
-      _connections.remove(_serviceId);
       return new _DetachedSocket(_socket, detachedIncoming);
     });
   }
@@ -2433,61 +2401,11 @@ class _HttpConnection extends LinkedListEntry<_HttpConnection>
   bool get _isActive => _state == _ACTIVE;
   bool get _isIdle => _state == _IDLE;
   bool get _isClosing => _state == _CLOSING;
-
-  String get _serviceTypePath => 'io/http/serverconnections';
-  String get _serviceTypeName => 'HttpServerConnection';
-
-  Map _toJSON(bool ref) {
-    var name = "${_socket.address.host}:${_socket.port} <-> "
-        "${_socket.remoteAddress.host}:${_socket.remotePort}";
-    var r = <String, dynamic>{
-      'id': _servicePath,
-      'type': _serviceType(ref),
-      'name': name,
-      'user_name': name,
-    };
-    if (ref) {
-      return r;
-    }
-    r['server'] = _httpServer._toJSON(true);
-    try {
-      // TODO(kevmoo): don't rely on SDK implementation!
-      r['socket'] = (_socket as dynamic)._toJSON(true);
-    } catch (_) {
-      r['socket'] = {
-        'id': _servicePath,
-        'type': '@Socket',
-        'name': 'UserSocket',
-        'user_name': 'UserSocket',
-      };
-    }
-    switch (_state) {
-      case _ACTIVE:
-        r['state'] = "Active";
-        break;
-      case _IDLE:
-        r['state'] = "Idle";
-        break;
-      case _CLOSING:
-        r['state'] = "Closing";
-        break;
-      case _DETACHED:
-        r['state'] = "Detached";
-        break;
-      default:
-        r['state'] = 'Unknown';
-        break;
-    }
-    return r;
-  }
 }
 
 // HTTP server waiting for socket connections.
-class _HttpServer extends Stream<HttpRequest>
-    with _ServiceObject
-    implements HttpServer {
+class _HttpServer extends Stream<HttpRequest> implements HttpServer {
   // Use default Map so we keep order.
-  static final Map<int, _HttpServer> _servers = new Map<int, _HttpServer>();
 
   String serverHeader;
   final HttpHeaders defaultResponseHeaders = _initDefaultResponseHeaders();
@@ -2528,14 +2446,12 @@ class _HttpServer extends Stream<HttpRequest>
     _controller =
         new StreamController<HttpRequest>(sync: true, onCancel: close);
     idleTimeout = const Duration(seconds: 120);
-    _servers[_serviceId] = this;
   }
 
   _HttpServer.listenOn(this._serverSocket) : _closeServer = false {
     _controller =
         new StreamController<HttpRequest>(sync: true, onCancel: close);
     idleTimeout = const Duration(seconds: 120);
-    _servers[_serviceId] = this;
   }
 
   static HttpHeaders _initDefaultResponseHeaders() {
@@ -2615,7 +2531,6 @@ class _HttpServer extends Stream<HttpRequest>
         _sessionManagerInstance != null) {
       _sessionManagerInstance.close();
       _sessionManagerInstance = null;
-      _servers.remove(_serviceId);
     }
   }
 
@@ -2679,37 +2594,6 @@ class _HttpServer extends Stream<HttpRequest>
       assert(conn._isIdle);
     });
     return result;
-  }
-
-  String get _serviceTypePath => 'io/http/servers';
-  String get _serviceTypeName => 'HttpServer';
-
-  Map<String, dynamic> _toJSON(bool ref) {
-    var r = <String, dynamic>{
-      'id': _servicePath,
-      'type': _serviceType(ref),
-      'name': '${address.host}:$port',
-      'user_name': '${address.host}:$port',
-    };
-    if (ref) {
-      return r;
-    }
-    try {
-      r['socket'] = _serverSocket._toJSON(true);
-    } catch (_) {
-      r['socket'] = {
-        'id': _servicePath,
-        'type': '@Socket',
-        'name': 'UserSocket',
-        'user_name': 'UserSocket',
-      };
-    }
-    r['port'] = port;
-    r['address'] = address.host;
-    r['active'] = _activeConnections.map((c) => c._toJSON(true)).toList();
-    r['idle'] = _idleConnections.map((c) => c._toJSON(true)).toList();
-    r['closed'] = closed;
-    return r;
   }
 
   _HttpSessionManager _sessionManagerInstance;
