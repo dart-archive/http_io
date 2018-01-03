@@ -11,6 +11,9 @@ const String _DART_SESSION_ID = "DARTSESSID";
 class _HttpSession implements HttpSession {
   // Destroyed marked. Used by the http connection to see if a session is valid.
   bool _destroyed = false;
+
+  // TODO(kevmoo): file a linter bug on this!
+  // ignore: prefer_final_fields
   bool _isNew = true;
   DateTime _lastSeen;
   Function _timeoutCallback;

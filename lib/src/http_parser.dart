@@ -210,7 +210,7 @@ class _HttpDetachedIncoming extends Stream<List<int>> {
 }
 
 /**
- * HTTP parser which parses the data stream given to [consume].
+ * HTTP parser which parses the data stream given to consume.
  *
  * If an HTTP parser error occurs, the parser will signal an error to either
  * the current _HttpIncoming or the _parser itself.
@@ -508,7 +508,7 @@ class _HttpParser extends Stream<_HttpIncoming> {
 
         case _State.REQUEST_LINE_URI:
           if (byte == _CharCode.SP) {
-            if (_uri_or_reason_phrase.length == 0) {
+            if (_uri_or_reason_phrase.isEmpty) {
               throw new HttpException("Invalid request URI");
             }
             _state = _State.REQUEST_LINE_HTTP_VERSION;
@@ -586,6 +586,8 @@ class _HttpParser extends Stream<_HttpIncoming> {
 
         case _State.RESPONSE_LINE_ENDING:
           _expect(byte, _CharCode.LF);
+          // TODO(kevmoo): file a linter bug on this!
+          // ignore: unnecessary_statements
           _messageType == _MessageType.RESPONSE;
           if (_statusCode < 100 || _statusCode > 599) {
             throw new HttpException("Invalid response status code");
@@ -992,7 +994,7 @@ class _HttpParser extends Stream<_HttpIncoming> {
     assert(_incoming == null);
     assert(_bodyController == null);
     assert(!_bodyPaused);
-    var incoming;
+    _HttpIncoming incoming;
     _bodyController = new StreamController<List<int>>(
         sync: true,
         onListen: () {

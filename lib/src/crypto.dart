@@ -40,7 +40,7 @@ class _CryptoUtils {
     -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2
   ];
 
-  static Random _rng = new Random.secure();
+  static final Random _rng = new Random.secure();
 
   static Uint8List getRandomBytes(int count) {
     final Uint8List result = new Uint8List(count);
@@ -214,7 +214,7 @@ abstract class _HashBase {
     _digestCalled = true;
     _finalizeData();
     _iterate();
-    assert(_pendingData.length == 0);
+    assert(_pendingData.isEmpty);
     return _resultAsBytes();
   }
 
@@ -360,8 +360,8 @@ class _MD5 extends _HashBase {
     var c = _h[2];
     var d = _h[3];
 
-    var t0;
-    var t1;
+    int t0;
+    int t1;
 
     for (var i = 0; i < 64; i++) {
       if (i < 16) {

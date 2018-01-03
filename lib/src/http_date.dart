@@ -177,7 +177,7 @@ class HttpDate {
 
     int expectNum(String separator) {
       int pos;
-      if (separator.length > 0) {
+      if (separator.isNotEmpty) {
         pos = date.indexOf(separator, index);
       } else {
         pos = date.length;
@@ -287,6 +287,7 @@ class HttpDate {
 
     int toInt(String s) {
       int index = 0;
+      // ignore: empty_statements
       for (; index < s.length && isDigit(s[index]); index++);
       return int.parse(s.substring(0, index));
     }
