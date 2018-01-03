@@ -2,12 +2,20 @@ language: dart
 sudo: false
 
 dart:
+  - stable
   - dev
 
 dart_task:
   - test: --platform vm
   - dartanalyzer
   - dartfmt
+
+# 1.24 analyzer breaks on generic method syntax. Remove this exclusion when
+# there is a new stable version.
+matrix:
+  exclude:
+  - dart: stable
+    dart_task: dartanalyzer
 
 # Only building master means that we don't run two builds for each pull request.
 branches:
