@@ -127,7 +127,7 @@ typedef void _BytesConsumer(List<int> bytes);
 
 class _HttpIncoming extends Stream<List<int>> {
   final int _transferLength;
-  final Completer _dataCompleter = new Completer();
+  final _dataCompleter = new Completer<bool>();
   Stream<List<int>> _stream;
 
   bool fullBodyRead = false;
@@ -164,7 +164,7 @@ class _HttpIncoming extends Stream<List<int>> {
   }
 
   // Is completed once all data have been received.
-  Future get dataDone => _dataCompleter.future;
+  Future<bool> get dataDone => _dataCompleter.future;
 
   void close(bool closing) {
     fullBodyRead = true;
@@ -377,7 +377,7 @@ class _HttpClientResponse extends _HttpInboundMessage
       _httpRequest._httpClientConnection.destroy();
       return new Stream<List<int>>.empty().listen(null, onDone: onDone);
     }
-    var stream = _incoming;
+    Stream<List<int>> stream = _incoming;
     if (_httpClient.autoUncompress &&
         headers.value(HttpHeaders.CONTENT_ENCODING) == "gzip") {
       stream = stream.transform(GZIP.decoder);
@@ -440,7 +440,8 @@ class _HttpClientResponse extends _HttpInboundMessage
       }
     }
 
-    Future requestAuthentication(_AuthenticationScheme scheme, String realm) {
+    Future<bool> requestAuthentication(
+        _AuthenticationScheme scheme, String realm) {
       if (proxyAuth) {
         if (_httpClient._authenticateProxy == null) {
           return new Future.value(false);
@@ -642,7 +643,7 @@ class _StreamSinkImpl<T> implements StreamSink<T> {
           // No new stream, .close was called. Close _target.
           _closeTarget();
         }
-      }, onError: (error, stackTrace) {
+      }, onError: (error, StackTrace stackTrace) {
         if (_isBound) {
           // A new stream takes over - forward errors to that stream.
           _controllerCompleter.completeError(error, stackTrace);
@@ -1350,7 +1351,7 @@ class _HttpOutgoing implements StreamConsumer<List<int>> {
     }
     return socket.addStream(controller.stream).then((_) {
       return outbound;
-    }, onError: (error, stackTrace) {
+    }, onError: (error, StackTrace stackTrace) {
       // Be sure to close it in case of an error.
       if (_gzip) _gzipSink.close();
       _socketError = true;
@@ -1427,7 +1428,7 @@ class _HttpOutgoing implements StreamConsumer<List<int>> {
       return socket.flush().then((_) {
         _doneCompleter.complete(socket);
         return outbound;
-      }, onError: (error, stackTrace) {
+      }, onError: (error, StackTrace stackTrace) {
         _doneCompleter.completeError(error, stackTrace);
         if (_ignoreError(error)) {
           return outbound;
@@ -1446,7 +1447,7 @@ class _HttpOutgoing implements StreamConsumer<List<int>> {
 
   Future<Socket> get done => _doneCompleter.future;
 
-  void setHeader(List<int> data, int length) {
+  void setHeader(Uint8List data, int length) {
     assert(_length == 0);
     _buffer = data;
     _length = length;
@@ -1736,7 +1737,8 @@ class _HttpClientConnection {
           .catchError((error) {
         throw new HttpException("Connection closed before data was received",
             uri: uri);
-      }, test: (error) => error is StateError).catchError((error, stackTrace) {
+      }, test: (error) => error is StateError).catchError(
+              (error, StackTrace stackTrace) {
         // We are done with the socket.
         destroy();
         request._onError(error, stackTrace);
@@ -1916,7 +1918,7 @@ class _ConnectionTarget {
       return currentBadCertificateCallback(certificate, uriHost, uriPort);
     }
 
-    Future socketFuture = (isSecure && proxy.isDirect
+    Future<Socket> socketFuture = (isSecure && proxy.isDirect
         ? SecureSocket.connect(host, port,
             context: context, onBadCertificate: callback)
         : Socket.connect(host, port));
@@ -2573,7 +2575,7 @@ class _HttpServer extends Stream<HttpRequest>
       // Accept the client connection.
       _HttpConnection connection = new _HttpConnection(socket, this);
       _idleConnections.add(connection);
-    }, onError: (error, stackTrace) {
+    }, onError: (error, StackTrace stackTrace) {
       // Ignore HandshakeExceptions as they are bound to a single request,
       // and are not fatal for the server.
       if (error is! HandshakeException) {
@@ -2962,7 +2964,7 @@ abstract class _Credentials {
 class _SiteCredentials extends _Credentials {
   Uri uri;
 
-  _SiteCredentials(this.uri, realm, _HttpClientCredentials creds)
+  _SiteCredentials(this.uri, String realm, _HttpClientCredentials creds)
       : super(creds, realm);
 
   bool applies(Uri uri, _AuthenticationScheme scheme) {
@@ -2990,7 +2992,8 @@ class _ProxyCredentials extends _Credentials {
   String host;
   int port;
 
-  _ProxyCredentials(this.host, this.port, realm, _HttpClientCredentials creds)
+  _ProxyCredentials(
+      this.host, this.port, String realm, _HttpClientCredentials creds)
       : super(creds, realm);
 
   bool applies(_Proxy proxy, _AuthenticationScheme scheme) {

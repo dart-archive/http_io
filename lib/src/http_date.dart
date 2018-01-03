@@ -292,7 +292,7 @@ class HttpDate {
       return int.parse(s.substring(0, index));
     }
 
-    var tokens = [];
+    var tokens = <String>[];
     while (!isEnd()) {
       while (!isEnd() && isDelimiter(date[position])) position++;
       int start = position;
@@ -307,7 +307,7 @@ class HttpDate {
     String yearStr;
 
     for (var token in tokens) {
-      if (token.length < 1) continue;
+      if (token.isEmpty) continue;
       if (timeStr == null &&
           token.length >= 5 &&
           isDigit(token[0]) &&
