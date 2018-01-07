@@ -2,9 +2,10 @@
 // for details. All rights reserved. Use of this source code is governed by a
 // BSD-style license that can be found in the LICENSE file.
 
-part of http_io;
+import 'dart:math';
+import 'dart:typed_data';
 
-class _CryptoUtils {
+class CryptoUtils {
   static const int PAD = 61; // '='
   static const int CR = 13; // '\r'
   static const int LF = 10; // '\n'
@@ -177,7 +178,7 @@ const _BYTES_PER_WORD = 4;
 
 // Base class encapsulating common behavior for cryptographic hash
 // functions.
-abstract class _HashBase {
+abstract class HashBase {
   // Hasher state.
   final int _chunkSizeInWords;
   final int _digestSizeInWords;
@@ -188,7 +189,7 @@ abstract class _HashBase {
   List<int> _h;
   bool _digestCalled = false;
 
-  _HashBase(
+  HashBase(
       this._chunkSizeInWords, this._digestSizeInWords, this._bigEndianWords)
       : _pendingData = [] {
     _currentChunk = new List(_chunkSizeInWords);
@@ -316,8 +317,8 @@ abstract class _HashBase {
 }
 
 // The MD5 hasher is used to compute an MD5 message digest.
-class _MD5 extends _HashBase {
-  _MD5() : super(16, 4, false) {
+class MD5 extends HashBase {
+  MD5() : super(16, 4, false) {
     _h[0] = 0x67452301;
     _h[1] = 0xefcdab89;
     _h[2] = 0x98badcfe;
@@ -325,8 +326,8 @@ class _MD5 extends _HashBase {
   }
 
   // Returns a new instance of this Hash.
-  _MD5 newInstance() {
-    return new _MD5();
+  MD5 newInstance() {
+    return new MD5();
   }
 
   static const _k = const [
