@@ -2,53 +2,14 @@
 // for details. All rights reserved. Use of this source code is governed by a
 // BSD-style license that can be found in the LICENSE file.
 
-part of http_io;
+import 'dart:async';
+import 'dart:typed_data';
 
-// Global constants.
-class _Const {
-  // Bytes for "HTTP".
-  static const HTTP = const [72, 84, 84, 80];
-  // Bytes for "HTTP/1.".
-  static const HTTP1DOT = const [72, 84, 84, 80, 47, 49, 46];
-  // Bytes for "HTTP/1.0".
-  static const HTTP10 = const [72, 84, 84, 80, 47, 49, 46, 48];
-  // Bytes for "HTTP/1.1".
-  static const HTTP11 = const [72, 84, 84, 80, 47, 49, 46, 49];
-
-  static const bool T = true;
-  static const bool F = false;
-  // Lookup-map for the following characters: '()<>@,;:\\"/[]?={} \t'.
-  static const SEPARATOR_MAP = const [
-    F, F, F, F, F, F, F, F, F, T, F, F, F, F, F, F, F, F, F, F, F, F, F, F, //
-    F, F, F, F, F, F, F, F, T, F, T, F, F, F, F, F, T, T, F, F, T, F, F, T, //
-    F, F, F, F, F, F, F, F, F, F, T, T, T, T, T, T, T, F, F, F, F, F, F, F, //
-    F, F, F, F, F, F, F, F, F, F, F, F, F, F, F, F, F, F, F, T, T, T, F, F, //
-    F, F, F, F, F, F, F, F, F, F, F, F, F, F, F, F, F, F, F, F, F, F, F, F, //
-    F, F, F, T, F, T, F, F, F, F, F, F, F, F, F, F, F, F, F, F, F, F, F, F, //
-    F, F, F, F, F, F, F, F, F, F, F, F, F, F, F, F, F, F, F, F, F, F, F, F, //
-    F, F, F, F, F, F, F, F, F, F, F, F, F, F, F, F, F, F, F, F, F, F, F, F, //
-    F, F, F, F, F, F, F, F, F, F, F, F, F, F, F, F, F, F, F, F, F, F, F, F, //
-    F, F, F, F, F, F, F, F, F, F, F, F, F, F, F, F, F, F, F, F, F, F, F, F, //
-    F, F, F, F, F, F, F, F, F, F, F, F, F, F, F, F
-  ];
-}
-
-// Frequently used character codes.
-class _CharCode {
-  static const int HT = 9;
-  static const int LF = 10;
-  static const int CR = 13;
-  static const int SP = 32;
-  static const int AMPERSAND = 38;
-  static const int COMMA = 44;
-  static const int DASH = 45;
-  static const int SLASH = 47;
-  static const int ZERO = 48;
-  static const int ONE = 49;
-  static const int COLON = 58;
-  static const int SEMI_COLON = 59;
-  static const int EQUAL = 61;
-}
+import 'char_code.dart';
+import 'http_exception.dart';
+import 'http_headers_impl.dart';
+import 'http_incoming.dart';
+import 'http_status.dart';
 
 // States of the HTTP parser state machine.
 class _State {
@@ -182,11 +143,11 @@ class _HttpDetachedStreamSubscription implements StreamSubscription<List<int>> {
   }
 }
 
-class _HttpDetachedIncoming extends Stream<List<int>> {
+class HttpDetachedIncoming extends Stream<List<int>> {
   final StreamSubscription<List<int>> subscription;
   final List<int> bufferedData;
 
-  _HttpDetachedIncoming(this.subscription, this.bufferedData);
+  HttpDetachedIncoming(this.subscription, this.bufferedData);
 
   StreamSubscription<List<int>> listen(void onData(List<int> event),
       {Function onError, void onDone(), bool cancelOnError}) {
@@ -229,7 +190,7 @@ class _HttpDetachedIncoming extends Stream<List<int>> {
  * and should be handled according to whatever protocol is being
  * upgraded to.
  */
-class _HttpParser extends Stream<_HttpIncoming> {
+class HttpParser extends Stream<HttpIncoming> {
   // State.
   bool _parserCalled = false;
 
@@ -257,26 +218,26 @@ class _HttpParser extends Stream<_HttpIncoming> {
   bool _noMessageBody = false;
   int _remainingContent = -1;
 
-  _HttpHeaders _headers;
+  HttpHeadersImpl _headers;
 
   // The current incoming connection.
-  _HttpIncoming _incoming;
+  HttpIncoming _incoming;
   StreamSubscription<List<int>> _socketSubscription;
   bool _paused = true;
   bool _bodyPaused = false;
-  StreamController<_HttpIncoming> _controller;
+  StreamController<HttpIncoming> _controller;
   StreamController<List<int>> _bodyController;
 
-  factory _HttpParser.requestParser() {
-    return new _HttpParser._(true);
+  factory HttpParser.requestParser() {
+    return new HttpParser._(true);
   }
 
-  factory _HttpParser.responseParser() {
-    return new _HttpParser._(false);
+  factory HttpParser.responseParser() {
+    return new HttpParser._(false);
   }
 
-  _HttpParser._(this._requestParser) {
-    _controller = new StreamController<_HttpIncoming>(
+  HttpParser._(this._requestParser) {
+    _controller = new StreamController<HttpIncoming>(
         sync: true,
         onListen: () {
           _paused = false;
@@ -297,7 +258,7 @@ class _HttpParser extends Stream<_HttpIncoming> {
     _reset();
   }
 
-  StreamSubscription<_HttpIncoming> listen(void onData(_HttpIncoming event),
+  StreamSubscription<HttpIncoming> listen(void onData(HttpIncoming event),
       {Function onError, void onDone(), bool cancelOnError}) {
     return _controller.stream.listen(onData,
         onError: onError, onDone: onDone, cancelOnError: cancelOnError);
@@ -326,7 +287,7 @@ class _HttpParser extends Stream<_HttpIncoming> {
   // parsing and return. This will be in case of either an upgrade
   // request or a request or response with an empty body.
   bool _headersEnd() {
-    _headers._mutable = false;
+    _headers.mutable = false;
 
     _transferLength = _headers.contentLength;
     // Ignore the Content-Length header if Transfer-Encoding
@@ -418,13 +379,13 @@ class _HttpParser extends Stream<_HttpIncoming> {
       int byte = _buffer[_index++];
       switch (_state) {
         case _State.START:
-          if (byte == _Const.HTTP[0]) {
+          if (byte == Const.HTTP[0]) {
             // Start parsing method or HTTP version.
             _httpVersionIndex = 1;
             _state = _State.METHOD_OR_RESPONSE_HTTP_VERSION;
           } else {
             // Start parsing method.
-            if (!_isTokenChar(byte)) {
+            if (!CharCode.isTokenChar(byte)) {
               throw new HttpException("Invalid request method");
             }
             _method.add(byte);
@@ -436,12 +397,12 @@ class _HttpParser extends Stream<_HttpIncoming> {
           break;
 
         case _State.METHOD_OR_RESPONSE_HTTP_VERSION:
-          if (_httpVersionIndex < _Const.HTTP.length &&
-              byte == _Const.HTTP[_httpVersionIndex]) {
+          if (_httpVersionIndex < Const.HTTP.length &&
+              byte == Const.HTTP[_httpVersionIndex]) {
             // Continue parsing HTTP version.
             _httpVersionIndex++;
-          } else if (_httpVersionIndex == _Const.HTTP.length &&
-              byte == _CharCode.SLASH) {
+          } else if (_httpVersionIndex == Const.HTTP.length &&
+              byte == CharCode.SLASH) {
             // HTTP/ parsed. As method is a token this cannot be a
             // method anymore.
             _httpVersionIndex++;
@@ -452,9 +413,9 @@ class _HttpParser extends Stream<_HttpIncoming> {
           } else {
             // Did not parse HTTP version. Expect method instead.
             for (int i = 0; i < _httpVersionIndex; i++) {
-              _method.add(_Const.HTTP[i]);
+              _method.add(Const.HTTP[i]);
             }
-            if (byte == _CharCode.SP) {
+            if (byte == CharCode.SP) {
               _state = _State.REQUEST_LINE_URI;
             } else {
               _method.add(byte);
@@ -468,24 +429,24 @@ class _HttpParser extends Stream<_HttpIncoming> {
           break;
 
         case _State.RESPONSE_HTTP_VERSION:
-          if (_httpVersionIndex < _Const.HTTP1DOT.length) {
+          if (_httpVersionIndex < Const.HTTP1DOT.length) {
             // Continue parsing HTTP version.
-            _expect(byte, _Const.HTTP1DOT[_httpVersionIndex]);
+            _expect(byte, Const.HTTP1DOT[_httpVersionIndex]);
             _httpVersionIndex++;
-          } else if (_httpVersionIndex == _Const.HTTP1DOT.length &&
-              byte == _CharCode.ONE) {
+          } else if (_httpVersionIndex == Const.HTTP1DOT.length &&
+              byte == CharCode.ONE) {
             // HTTP/1.1 parsed.
             _httpVersion = _HttpVersion.HTTP11;
             _persistentConnection = true;
             _httpVersionIndex++;
-          } else if (_httpVersionIndex == _Const.HTTP1DOT.length &&
-              byte == _CharCode.ZERO) {
+          } else if (_httpVersionIndex == Const.HTTP1DOT.length &&
+              byte == CharCode.ZERO) {
             // HTTP/1.0 parsed.
             _httpVersion = _HttpVersion.HTTP10;
             _persistentConnection = false;
             _httpVersionIndex++;
-          } else if (_httpVersionIndex == _Const.HTTP1DOT.length + 1) {
-            _expect(byte, _CharCode.SP);
+          } else if (_httpVersionIndex == Const.HTTP1DOT.length + 1) {
+            _expect(byte, CharCode.SP);
             // HTTP version parsed.
             _state = _State.RESPONSE_LINE_STATUS_CODE;
           } else {
@@ -494,12 +455,12 @@ class _HttpParser extends Stream<_HttpIncoming> {
           break;
 
         case _State.REQUEST_LINE_METHOD:
-          if (byte == _CharCode.SP) {
+          if (byte == CharCode.SP) {
             _state = _State.REQUEST_LINE_URI;
           } else {
-            if (_Const.SEPARATOR_MAP[byte] ||
-                byte == _CharCode.CR ||
-                byte == _CharCode.LF) {
+            if (Const.SEPARATOR_MAP[byte] ||
+                byte == CharCode.CR ||
+                byte == CharCode.LF) {
               throw new HttpException("Invalid request method");
             }
             _method.add(byte);
@@ -507,14 +468,14 @@ class _HttpParser extends Stream<_HttpIncoming> {
           break;
 
         case _State.REQUEST_LINE_URI:
-          if (byte == _CharCode.SP) {
+          if (byte == CharCode.SP) {
             if (_uri_or_reason_phrase.isEmpty) {
               throw new HttpException("Invalid request URI");
             }
             _state = _State.REQUEST_LINE_HTTP_VERSION;
             _httpVersionIndex = 0;
           } else {
-            if (byte == _CharCode.CR || byte == _CharCode.LF) {
+            if (byte == CharCode.CR || byte == CharCode.LF) {
               throw new HttpException("Invalid request URI");
             }
             _uri_or_reason_phrase.add(byte);
@@ -522,16 +483,16 @@ class _HttpParser extends Stream<_HttpIncoming> {
           break;
 
         case _State.REQUEST_LINE_HTTP_VERSION:
-          if (_httpVersionIndex < _Const.HTTP1DOT.length) {
-            _expect(byte, _Const.HTTP11[_httpVersionIndex]);
+          if (_httpVersionIndex < Const.HTTP1DOT.length) {
+            _expect(byte, Const.HTTP11[_httpVersionIndex]);
             _httpVersionIndex++;
-          } else if (_httpVersionIndex == _Const.HTTP1DOT.length) {
-            if (byte == _CharCode.ONE) {
+          } else if (_httpVersionIndex == Const.HTTP1DOT.length) {
+            if (byte == CharCode.ONE) {
               // HTTP/1.1 parsed.
               _httpVersion = _HttpVersion.HTTP11;
               _persistentConnection = true;
               _httpVersionIndex++;
-            } else if (byte == _CharCode.ZERO) {
+            } else if (byte == CharCode.ZERO) {
               // HTTP/1.0 parsed.
               _httpVersion = _HttpVersion.HTTP10;
               _persistentConnection = false;
@@ -540,10 +501,10 @@ class _HttpParser extends Stream<_HttpIncoming> {
               throw new HttpException("Invalid response line");
             }
           } else {
-            if (byte == _CharCode.CR) {
+            if (byte == CharCode.CR) {
               _state = _State.REQUEST_LINE_ENDING;
             } else {
-              _expect(byte, _CharCode.LF);
+              _expect(byte, CharCode.LF);
               _messageType = _MessageType.REQUEST;
               _state = _State.HEADER_START;
             }
@@ -551,15 +512,15 @@ class _HttpParser extends Stream<_HttpIncoming> {
           break;
 
         case _State.REQUEST_LINE_ENDING:
-          _expect(byte, _CharCode.LF);
+          _expect(byte, CharCode.LF);
           _messageType = _MessageType.REQUEST;
           _state = _State.HEADER_START;
           break;
 
         case _State.RESPONSE_LINE_STATUS_CODE:
-          if (byte == _CharCode.SP) {
+          if (byte == CharCode.SP) {
             _state = _State.RESPONSE_LINE_REASON_PHRASE;
-          } else if (byte == _CharCode.CR) {
+          } else if (byte == CharCode.CR) {
             // Some HTTP servers does not follow the spec. and send
             // \r\n right after the status code.
             _state = _State.RESPONSE_LINE_ENDING;
@@ -574,10 +535,10 @@ class _HttpParser extends Stream<_HttpIncoming> {
           break;
 
         case _State.RESPONSE_LINE_REASON_PHRASE:
-          if (byte == _CharCode.CR) {
+          if (byte == CharCode.CR) {
             _state = _State.RESPONSE_LINE_ENDING;
           } else {
-            if (byte == _CharCode.CR || byte == _CharCode.LF) {
+            if (byte == CharCode.CR || byte == CharCode.LF) {
               throw new HttpException("Invalid response reason phrase");
             }
             _uri_or_reason_phrase.add(byte);
@@ -585,7 +546,7 @@ class _HttpParser extends Stream<_HttpIncoming> {
           break;
 
         case _State.RESPONSE_LINE_ENDING:
-          _expect(byte, _CharCode.LF);
+          _expect(byte, CharCode.LF);
           // TODO(kevmoo): file a linter bug on this!
           // ignore: unnecessary_statements
           _messageType == _MessageType.RESPONSE;
@@ -603,10 +564,10 @@ class _HttpParser extends Stream<_HttpIncoming> {
           break;
 
         case _State.HEADER_START:
-          _headers = new _HttpHeaders(version);
-          if (byte == _CharCode.CR) {
+          _headers = new HttpHeadersImpl(version);
+          if (byte == CharCode.CR) {
             _state = _State.HEADER_ENDING;
-          } else if (byte == _CharCode.LF) {
+          } else if (byte == CharCode.LF) {
             _state = _State.HEADER_ENDING;
             _index--; // Make the new state see the LF again.
           } else {
@@ -617,10 +578,10 @@ class _HttpParser extends Stream<_HttpIncoming> {
           break;
 
         case _State.HEADER_FIELD:
-          if (byte == _CharCode.COLON) {
+          if (byte == CharCode.COLON) {
             _state = _State.HEADER_VALUE_START;
           } else {
-            if (!_isTokenChar(byte)) {
+            if (!CharCode.isTokenChar(byte)) {
               throw new HttpException("Invalid header field name");
             }
             _headerField.add(_toLowerCaseByte(byte));
@@ -628,11 +589,11 @@ class _HttpParser extends Stream<_HttpIncoming> {
           break;
 
         case _State.HEADER_VALUE_START:
-          if (byte == _CharCode.CR) {
+          if (byte == CharCode.CR) {
             _state = _State.HEADER_VALUE_FOLDING_OR_ENDING;
-          } else if (byte == _CharCode.LF) {
+          } else if (byte == CharCode.LF) {
             _state = _State.HEADER_VALUE_FOLD_OR_END;
-          } else if (byte != _CharCode.SP && byte != _CharCode.HT) {
+          } else if (byte != CharCode.SP && byte != CharCode.HT) {
             // Start of new header value.
             _headerValue.add(byte);
             _state = _State.HEADER_VALUE;
@@ -640,9 +601,9 @@ class _HttpParser extends Stream<_HttpIncoming> {
           break;
 
         case _State.HEADER_VALUE:
-          if (byte == _CharCode.CR) {
+          if (byte == CharCode.CR) {
             _state = _State.HEADER_VALUE_FOLDING_OR_ENDING;
-          } else if (byte == _CharCode.LF) {
+          } else if (byte == CharCode.LF) {
             _state = _State.HEADER_VALUE_FOLD_OR_END;
           } else {
             _headerValue.add(byte);
@@ -650,12 +611,12 @@ class _HttpParser extends Stream<_HttpIncoming> {
           break;
 
         case _State.HEADER_VALUE_FOLDING_OR_ENDING:
-          _expect(byte, _CharCode.LF);
+          _expect(byte, CharCode.LF);
           _state = _State.HEADER_VALUE_FOLD_OR_END;
           break;
 
         case _State.HEADER_VALUE_FOLD_OR_END:
-          if (byte == _CharCode.SP || byte == _CharCode.HT) {
+          if (byte == CharCode.SP || byte == CharCode.HT) {
             _state = _State.HEADER_VALUE_START;
           } else {
             String headerField = new String.fromCharCodes(_headerField);
@@ -677,17 +638,17 @@ class _HttpParser extends Stream<_HttpIncoming> {
                     (isUpgrade && isResponse && isUpgradeCode)) {
                   _connectionUpgrade = true;
                 }
-                _headers._add(headerField, tokens[i]);
+                _headers.add(headerField, tokens[i]);
               }
             } else {
-              _headers._add(headerField, headerValue);
+              _headers.add(headerField, headerValue);
             }
             _headerField.clear();
             _headerValue.clear();
 
-            if (byte == _CharCode.CR) {
+            if (byte == CharCode.CR) {
               _state = _State.HEADER_ENDING;
-            } else if (byte == _CharCode.LF) {
+            } else if (byte == CharCode.LF) {
               _state = _State.HEADER_ENDING;
               _index--; // Make the new state see the LF again.
             } else {
@@ -699,7 +660,7 @@ class _HttpParser extends Stream<_HttpIncoming> {
           break;
 
         case _State.HEADER_ENDING:
-          _expect(byte, _CharCode.LF);
+          _expect(byte, CharCode.LF);
           if (_headersEnd()) {
             return;
           } else {
@@ -708,19 +669,19 @@ class _HttpParser extends Stream<_HttpIncoming> {
           return;
 
         case _State.CHUNK_SIZE_STARTING_CR:
-          _expect(byte, _CharCode.CR);
+          _expect(byte, CharCode.CR);
           _state = _State.CHUNK_SIZE_STARTING_LF;
           break;
 
         case _State.CHUNK_SIZE_STARTING_LF:
-          _expect(byte, _CharCode.LF);
+          _expect(byte, CharCode.LF);
           _state = _State.CHUNK_SIZE;
           break;
 
         case _State.CHUNK_SIZE:
-          if (byte == _CharCode.CR) {
+          if (byte == CharCode.CR) {
             _state = _State.CHUNK_SIZE_ENDING;
-          } else if (byte == _CharCode.SEMI_COLON) {
+          } else if (byte == CharCode.SEMI_COLON) {
             _state = _State.CHUNK_SIZE_EXTENSION;
           } else {
             int value = _expectHexDigit(byte);
@@ -729,13 +690,13 @@ class _HttpParser extends Stream<_HttpIncoming> {
           break;
 
         case _State.CHUNK_SIZE_EXTENSION:
-          if (byte == _CharCode.CR) {
+          if (byte == CharCode.CR) {
             _state = _State.CHUNK_SIZE_ENDING;
           }
           break;
 
         case _State.CHUNK_SIZE_ENDING:
-          _expect(byte, _CharCode.LF);
+          _expect(byte, CharCode.LF);
           if (_remainingContent > 0) {
             _state = _State.BODY;
           } else {
@@ -744,12 +705,12 @@ class _HttpParser extends Stream<_HttpIncoming> {
           break;
 
         case _State.CHUNKED_BODY_DONE_CR:
-          _expect(byte, _CharCode.CR);
+          _expect(byte, CharCode.CR);
           _state = _State.CHUNKED_BODY_DONE_LF;
           break;
 
         case _State.CHUNKED_BODY_DONE_LF:
-          _expect(byte, _CharCode.LF);
+          _expect(byte, CharCode.LF);
           _reset();
           _closeIncoming();
           break;
@@ -884,10 +845,10 @@ class _HttpParser extends Stream<_HttpIncoming> {
     if (value) _noMessageBody = true;
   }
 
-  _HttpDetachedIncoming detachIncoming() {
+  HttpDetachedIncoming detachIncoming() {
     // Simulate detached by marking as upgraded.
     _state = _State.UPGRADED;
-    return new _HttpDetachedIncoming(_socketSubscription, readUnparsedData());
+    return new HttpDetachedIncoming(_socketSubscription, readUnparsedData());
   }
 
   List<int> readUnparsedData() {
@@ -925,16 +886,6 @@ class _HttpParser extends Stream<_HttpIncoming> {
   void _releaseBuffer() {
     _buffer = null;
     _index = null;
-  }
-
-  static bool _isTokenChar(int byte) {
-    return byte > 31 && byte < 128 && !_Const.SEPARATOR_MAP[byte];
-  }
-
-  static bool _isValueChar(int byte) {
-    return (byte > 31 && byte < 128) ||
-        (byte == _CharCode.SP) ||
-        (byte == _CharCode.HT);
   }
 
   static List<String> _tokenizeFieldValue(String headerValue) {
@@ -994,7 +945,7 @@ class _HttpParser extends Stream<_HttpIncoming> {
     assert(_incoming == null);
     assert(_bodyController == null);
     assert(!_bodyPaused);
-    _HttpIncoming incoming;
+    HttpIncoming incoming;
     _bodyController = new StreamController<List<int>>(
         sync: true,
         onListen: () {
@@ -1024,7 +975,7 @@ class _HttpParser extends Stream<_HttpIncoming> {
           _controller.close();
         });
     incoming = _incoming =
-        new _HttpIncoming(_headers, transferLength, _bodyController.stream);
+        new HttpIncoming(_headers, transferLength, _bodyController.stream);
     _bodyPaused = true;
     _pauseStateChanged();
   }

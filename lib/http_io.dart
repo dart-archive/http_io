@@ -6,14 +6,7 @@ library http_io;
 
 import 'dart:async';
 import 'dart:collection'
-    show
-        HashMap,
-        HashSet,
-        Queue,
-        ListQueue,
-        LinkedList,
-        LinkedListEntry,
-        UnmodifiableMapView;
+    show HashMap, HashSet, Queue, ListQueue, LinkedList, LinkedListEntry;
 import 'dart:convert';
 import 'dart:io'
     show
@@ -21,7 +14,6 @@ import 'dart:io'
         GZIP,
         HandshakeException,
         InternetAddress,
-        IOException,
         IOSink,
         Platform,
         SecureServerSocket,
@@ -35,66 +27,25 @@ import 'dart:io'
         TlsException,
         X509Certificate,
         ZLibEncoder;
-import 'dart:math';
 import 'dart:typed_data';
 
-part 'src/crypto.dart';
-part 'src/http_date.dart';
-part 'src/http_headers.dart';
+import 'src/char_code.dart';
+import 'src/crypto.dart';
+import 'src/http_exception.dart';
+import 'src/http_headers_impl.dart';
+import 'src/http_incoming.dart';
+import 'src/http_parser.dart';
+import 'src/http_session.dart';
+import 'src/http_session_impl.dart';
+import 'src/http_status.dart';
+
+export 'src/http_date.dart';
+export 'src/http_exception.dart';
+export 'src/http_session.dart';
+export 'src/http_status.dart';
+
 part 'src/http_impl.dart';
 part 'src/http_overrides.dart';
-part 'src/http_parser.dart';
-part 'src/http_session.dart';
-
-/**
- * HTTP status codes.
- */
-abstract class HttpStatus {
-  static const int CONTINUE = 100;
-  static const int SWITCHING_PROTOCOLS = 101;
-  static const int OK = 200;
-  static const int CREATED = 201;
-  static const int ACCEPTED = 202;
-  static const int NON_AUTHORITATIVE_INFORMATION = 203;
-  static const int NO_CONTENT = 204;
-  static const int RESET_CONTENT = 205;
-  static const int PARTIAL_CONTENT = 206;
-  static const int MULTIPLE_CHOICES = 300;
-  static const int MOVED_PERMANENTLY = 301;
-  static const int FOUND = 302;
-  static const int MOVED_TEMPORARILY = 302; // Common alias for FOUND.
-  static const int SEE_OTHER = 303;
-  static const int NOT_MODIFIED = 304;
-  static const int USE_PROXY = 305;
-  static const int TEMPORARY_REDIRECT = 307;
-  static const int BAD_REQUEST = 400;
-  static const int UNAUTHORIZED = 401;
-  static const int PAYMENT_REQUIRED = 402;
-  static const int FORBIDDEN = 403;
-  static const int NOT_FOUND = 404;
-  static const int METHOD_NOT_ALLOWED = 405;
-  static const int NOT_ACCEPTABLE = 406;
-  static const int PROXY_AUTHENTICATION_REQUIRED = 407;
-  static const int REQUEST_TIMEOUT = 408;
-  static const int CONFLICT = 409;
-  static const int GONE = 410;
-  static const int LENGTH_REQUIRED = 411;
-  static const int PRECONDITION_FAILED = 412;
-  static const int REQUEST_ENTITY_TOO_LARGE = 413;
-  static const int REQUEST_URI_TOO_LONG = 414;
-  static const int UNSUPPORTED_MEDIA_TYPE = 415;
-  static const int REQUESTED_RANGE_NOT_SATISFIABLE = 416;
-  static const int EXPECTATION_FAILED = 417;
-  static const int UPGRADE_REQUIRED = 426;
-  static const int INTERNAL_SERVER_ERROR = 500;
-  static const int NOT_IMPLEMENTED = 501;
-  static const int BAD_GATEWAY = 502;
-  static const int SERVICE_UNAVAILABLE = 503;
-  static const int GATEWAY_TIMEOUT = 504;
-  static const int HTTP_VERSION_NOT_SUPPORTED = 505;
-  // Client generated status code.
-  static const int NETWORK_CONNECT_TIMEOUT_ERROR = 599;
-}
 
 /**
  * A server that delivers content, such as web pages, using the HTTP protocol.
@@ -712,7 +663,7 @@ abstract class HeaderValue {
    * Creates a new header value object setting the value and parameters.
    */
   factory HeaderValue([String value = "", Map<String, String> parameters]) {
-    return new _HeaderValue(value, parameters);
+    return new HeaderValueImpl(value, parameters);
   }
 
   /**
@@ -723,7 +674,7 @@ abstract class HeaderValue {
       {String parameterSeparator: ";",
       String valueSeparator,
       bool preserveBackslash: false}) {
-    return _HeaderValue.parse(value,
+    return HeaderValueImpl.parse(value,
         parameterSeparator: parameterSeparator,
         valueSeparator: valueSeparator,
         preserveBackslash: preserveBackslash);
@@ -748,29 +699,6 @@ abstract class HeaderValue {
    *     value; parameter1=value1; parameter2=value2
    */
   String toString();
-}
-
-abstract class HttpSession implements Map {
-  /**
-   * Gets the id for the current session.
-   */
-  String get id;
-
-  /**
-   * Destroys the session. This will terminate the session and any further
-   * connections with this id will be given a new id and session.
-   */
-  void destroy();
-
-  /**
-   * Sets a callback that will be called when the session is timed out.
-   */
-  void set onTimeout(void callback());
-
-  /**
-   * Is true if the session has not been sent to the client yet.
-   */
-  bool get isNew;
 }
 
 /**
@@ -817,7 +745,7 @@ abstract class ContentType implements HeaderValue {
    */
   factory ContentType(String primaryType, String subType,
       {String charset, Map<String, String> parameters}) {
-    return new _ContentType(primaryType, subType, charset, parameters);
+    return new ContentTypeImpl(primaryType, subType, charset, parameters);
   }
 
   /**
@@ -832,7 +760,7 @@ abstract class ContentType implements HeaderValue {
    * type [:html:] and parameter [:charset:] with value [:utf-8:].
    */
   static ContentType parse(String value) {
-    return _ContentType.parse(value);
+    return ContentTypeImpl.parse(value);
   }
 
   /**
@@ -910,14 +838,14 @@ abstract class Cookie {
    *
    * By default the value of `httpOnly` will be set to `true`.
    */
-  factory Cookie([String name, String value]) => new _Cookie(name, value);
+  factory Cookie([String name, String value]) => new CookieImpl(name, value);
 
   /**
    * Creates a new cookie by parsing a header value from a 'set-cookie'
    * header.
    */
   factory Cookie.fromSetCookieValue(String value) {
-    return new _Cookie.fromSetCookieValue(value);
+    return new CookieImpl.fromSetCookieValue(value);
   }
 
   /**
@@ -2023,21 +1951,6 @@ abstract class RedirectInfo {
 abstract class DetachedSocket {
   Socket get socket;
   List<int> get unparsedData;
-}
-
-class HttpException implements IOException {
-  final String message;
-  final Uri uri;
-
-  const HttpException(this.message, {this.uri});
-
-  String toString() {
-    var b = new StringBuffer()..write('HttpException: ')..write(message);
-    if (uri != null) {
-      b.write(', uri = $uri');
-    }
-    return b.toString();
-  }
 }
 
 class RedirectException implements HttpException {
