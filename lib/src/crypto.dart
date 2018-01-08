@@ -32,16 +32,16 @@ String userNamePasswordBase64(String userName, String password) =>
 String stringToUtf8Base64(String input) => BASE64.encode(UTF8.encode(input));
 
 /// Convenience class that emulates the older MD5 class fromm `package:crypto`.
-class MD5 {
+class MD5Helper {
   final _DigestSink _digestSink;
   final ByteConversionSink _conversionSink;
 
-  MD5._(this._digestSink, this._conversionSink);
+  MD5Helper._(this._digestSink, this._conversionSink);
 
-  factory MD5() {
+  factory MD5Helper() {
     var digestSink = new _DigestSink();
     var conversionSink = md5.startChunkedConversion(digestSink);
-    return new MD5._(digestSink, conversionSink);
+    return new MD5Helper._(digestSink, conversionSink);
   }
 
   void add(List<int> bytes) {

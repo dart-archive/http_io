@@ -2780,7 +2780,7 @@ abstract class _Credentials {
       // http://tools.ietf.org/html/draft-reschke-basicauth-enc-06. For
       // now always use UTF-8 encoding.
       _HttpClientDigestCredentials creds = credentials;
-      var hasher = new MD5()
+      var hasher = new MD5Helper()
         ..add(UTF8.encode(creds.username))
         ..add([CharCode.COLON])
         ..add(realm.codeUnits)
@@ -2891,7 +2891,7 @@ class _HttpClientDigestCredentials extends _HttpClientCredentials
 
   String authorization(_Credentials credentials, _HttpClientRequest request) {
     String requestUri = request._requestUri();
-    var hasher = new MD5()
+    var hasher = new MD5Helper()
       ..add(request.method.codeUnits)
       ..add([CharCode.COLON])
       ..add(requestUri.codeUnits);
@@ -2900,7 +2900,9 @@ class _HttpClientDigestCredentials extends _HttpClientCredentials
     String qop;
     String cnonce;
     String nc;
-    hasher = new MD5()..add(credentials.ha1.codeUnits)..add([CharCode.COLON]);
+    hasher = new MD5Helper()
+      ..add(credentials.ha1.codeUnits)
+      ..add([CharCode.COLON]);
     if (credentials.qop == "auth") {
       qop = credentials.qop;
       cnonce = bytesToHex(getRandomBytes(4));
