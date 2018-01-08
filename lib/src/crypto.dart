@@ -27,7 +27,11 @@ class CryptoUtils {
     return result.toString();
   }
 
-  static String bytesToBase64(List<int> bytes) => BASE64.encode(bytes);
+  static String userNamePasswordBase64(String userName, String password) =>
+      stringToUtf8Base64('$userName:$password');
+
+  static String stringToUtf8Base64(String input) =>
+      BASE64.encode(UTF8.encode(input));
 }
 
 /// Convenience class that emulates the older MD5 class fromm `package:crypto`.

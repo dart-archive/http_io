@@ -1585,8 +1585,8 @@ class _HttpClientConnection {
     if (proxy.isAuthenticated) {
       // If the proxy configuration contains user information use that
       // for proxy basic authorization.
-      String auth = CryptoUtils
-          .bytesToBase64(UTF8.encode("${proxy.username}:${proxy.password}"));
+      String auth =
+          CryptoUtils.userNamePasswordBase64(proxy.username, proxy.password);
       request.headers.set(HttpHeaders.PROXY_AUTHORIZATION, "Basic $auth");
     } else if (!proxy.isDirect && _httpClient._proxyCredentials.isNotEmpty) {
       proxyCreds = _httpClient._findProxyCredentials(proxy);
@@ -1597,7 +1597,7 @@ class _HttpClientConnection {
     if (uri.userInfo != null && uri.userInfo.isNotEmpty) {
       // If the URL contains user information use that for basic
       // authorization.
-      String auth = CryptoUtils.bytesToBase64(UTF8.encode(uri.userInfo));
+      String auth = CryptoUtils.stringToUtf8Base64(uri.userInfo);
       request.headers.set(HttpHeaders.AUTHORIZATION, "Basic $auth");
     } else {
       // Look for credentials.
@@ -1707,8 +1707,8 @@ class _HttpClientConnection {
     if (proxy.isAuthenticated) {
       // If the proxy configuration contains user information use that
       // for proxy basic authorization.
-      String auth = CryptoUtils
-          .bytesToBase64(UTF8.encode("${proxy.username}:${proxy.password}"));
+      String auth =
+          CryptoUtils.userNamePasswordBase64(proxy.username, proxy.password);
       request.headers.set(HttpHeaders.PROXY_AUTHORIZATION, "Basic $auth");
     }
     return request.close().then((response) {
@@ -2869,7 +2869,7 @@ class _HttpClientBasicCredentials extends _HttpClientCredentials
     // Proxy-Authenticate headers, see
     // http://tools.ietf.org/html/draft-reschke-basicauth-enc-06. For
     // now always use UTF-8 encoding.
-    String auth = CryptoUtils.bytesToBase64(UTF8.encode("$username:$password"));
+    String auth = CryptoUtils.userNamePasswordBase64(username, password);
     return "Basic $auth";
   }
 
