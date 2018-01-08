@@ -8,31 +8,28 @@ import 'dart:typed_data';
 
 import 'package:crypto/crypto.dart';
 
-class CryptoUtils {
-  static final Random _rng = new Random.secure();
+final Random _rng = new Random.secure();
 
-  static Uint8List getRandomBytes(int count) {
-    final Uint8List result = new Uint8List(count);
-    for (int i = 0; i < count; i++) {
-      result[i] = _rng.nextInt(0xff);
-    }
-    return result;
+Uint8List getRandomBytes(int count) {
+  final Uint8List result = new Uint8List(count);
+  for (int i = 0; i < count; i++) {
+    result[i] = _rng.nextInt(0xff);
   }
-
-  static String bytesToHex(List<int> bytes) {
-    var result = new StringBuffer();
-    for (var part in bytes) {
-      result.write(part.toRadixString(16).padLeft(2, '0'));
-    }
-    return result.toString();
-  }
-
-  static String userNamePasswordBase64(String userName, String password) =>
-      stringToUtf8Base64('$userName:$password');
-
-  static String stringToUtf8Base64(String input) =>
-      BASE64.encode(UTF8.encode(input));
+  return result;
 }
+
+String bytesToHex(List<int> bytes) {
+  var result = new StringBuffer();
+  for (var part in bytes) {
+    result.write(part.toRadixString(16).padLeft(2, '0'));
+  }
+  return result.toString();
+}
+
+String userNamePasswordBase64(String userName, String password) =>
+    stringToUtf8Base64('$userName:$password');
+
+String stringToUtf8Base64(String input) => BASE64.encode(UTF8.encode(input));
 
 /// Convenience class that emulates the older MD5 class fromm `package:crypto`.
 class MD5 {

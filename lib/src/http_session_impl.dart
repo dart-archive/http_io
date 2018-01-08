@@ -5,7 +5,7 @@
 import 'dart:async';
 import 'dart:collection' show HashMap;
 
-import 'crypto.dart';
+import 'crypto.dart' as crypto_utils;
 import 'http_session.dart';
 
 const String DART_SESSION_ID = "DARTSESSID";
@@ -99,8 +99,8 @@ class HttpSessionManager {
 
   String createSessionId() {
     const int _KEY_LENGTH = 16; // 128 bits.
-    var data = CryptoUtils.getRandomBytes(_KEY_LENGTH);
-    return CryptoUtils.bytesToHex(data);
+    var data = crypto_utils.getRandomBytes(_KEY_LENGTH);
+    return crypto_utils.bytesToHex(data);
   }
 
   HttpSessionImpl getSession(String id) => _sessions[id];
