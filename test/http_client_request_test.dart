@@ -45,47 +45,62 @@ Future<Null> testResponseDone() async {
 
 Future<Null> testBadResponseAdd() async {
   await testClientRequest((request) {
+    Completer<Null> completer = new Completer();
     request.contentLength = 0;
     request.add([0]);
     request.close();
-    request.done.catchError((error) {}, test: (e) => e is HttpException);
-    return request.done;
+    request.done.catchError((error) {
+      completer.complete(null);
+    }, test: (e) => e is HttpException);
+    return completer.future;
   });
 
   await testClientRequest((request) {
+    Completer<Null> completer = new Completer();
     request.contentLength = 5;
     request.add([0, 0, 0]);
     request.add([0, 0, 0]);
     request.close();
-    request.done.catchError((error) {}, test: (e) => e is HttpException);
-    return request.done;
+    request.done.catchError((error) {
+      completer.complete(null);
+    }, test: (e) => e is HttpException);
+    return completer.future;
   });
 
   await testClientRequest((request) {
+    Completer<Null> completer = new Completer();
     request.contentLength = 0;
     request.add(new Uint8List(64 * 1024));
     request.add(new Uint8List(64 * 1024));
     request.add(new Uint8List(64 * 1024));
     request.close();
-    request.done.catchError((error) {}, test: (e) => e is HttpException);
-    return request.done;
+    request.done.catchError((error) {
+      completer.complete(null);
+    }, test: (e) => e is HttpException);
+    return completer.future;
   });
 }
 
 Future<Null> testBadResponseClose() async {
   await testClientRequest((request) {
+    Completer<Null> completer = new Completer();
     request.contentLength = 5;
     request.close();
-    request.done.catchError((error) {}, test: (e) => e is HttpException);
-    return request.done;
+    request.done.catchError((error) {
+      completer.complete(null);
+    }, test: (e) => e is HttpException);
+    return completer.future;
   });
 
   await testClientRequest((request) {
+    Completer<Null> completer = new Completer();
     request.contentLength = 5;
     request.add([0]);
     request.close();
-    request.done.catchError((error) {}, test: (e) => e is HttpException);
-    return request.done;
+    request.done.catchError((error) {
+      completer.complete(null);
+    }, test: (e) => e is HttpException);
+    return completer.future;
   });
 }
 
