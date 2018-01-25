@@ -47,6 +47,13 @@ Future<Null> runServerProcess() {
     var sw = new Stopwatch()..start();
     var script =
         "${Directory.current.path}/test/http_client_stays_alive_test.dart";
+    if (!(new File(script)).existsSync()) {
+      // If we can't find the file relative to the cwd, then look relative to
+      // Platform.script.
+      script = Platform.script
+          .resolve('http_client_stays_alive_test.dart')
+          .toFilePath();
+    }
 
     var arguments = packageOptions()..add(script);
     Process.run(Platform.executable, arguments, environment: {'URL': url}).then(
