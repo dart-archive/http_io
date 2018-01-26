@@ -120,18 +120,24 @@ Future<Null> testClientCloseSendingResponse(int connections) {
 
 Future<Null> testClientCloseWhileSendingRequest(int connections) {
   Completer<Null> completer = new Completer();
-  HttpServer.bind("127.0.0.1", 0).then((server) {
+  HttpServer.bind("127.0.0.1", 0).then((server) async {
     server.listen((request) {
-      request.listen((_) {});
+      request.listen((_) {}, onError: (e) {
+        // A race may cause the connection to be closed while the server is
+        // receiving the insufficient number of bytes.
+        expect(e is HttpException, isTrue);
+      });
     });
     var client = new HttpClient();
     int closed = 0;
     for (int i = 0; i < connections; i++) {
-      client.post("127.0.0.1", server.port, "/").then((request) {
+      await client.post("127.0.0.1", server.port, "/").then((request) {
         request.contentLength = 110;
         request.write("0123456789");
+        // This triggers an error because fewer bytes were written than
+        // specified in contentLength.
         return request.close();
-      }).catchError((_) {
+      }).catchError((e) {
         closed++;
         if (closed == connections) {
           server.close();
