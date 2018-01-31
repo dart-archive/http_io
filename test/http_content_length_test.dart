@@ -2,8 +2,6 @@
 // for details. All rights reserved. Use of this source code is governed by a
 // BSD-style license that can be found in the LICENSE file.
 
-import "dart:async";
-import "dart:isolate";
 import "dart:io";
 import "package:test/test.dart";
 
@@ -116,8 +114,8 @@ void testBody(int totalConnections, bool useHeader) {
         request.write("x");
         return request.close();
       }).then((response) {
-        equals("2", equals(response.headers.value('content-length')));
-        equals(2, equals(response.contentLength));
+        expect("2", equals(response.headers.value('content-length')));
+        expect(2, equals(response.contentLength));
         response.listen((d) {}, onDone: () {
           if (++clientCount == totalConnections) {
             client.close();
