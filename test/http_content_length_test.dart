@@ -2,10 +2,13 @@
 // for details. All rights reserved. Use of this source code is governed by a
 // BSD-style license that can be found in the LICENSE file.
 
-import "dart:io";
+import "dart:async";
+
+import "package:http_io/http_io.dart";
 import "package:test/test.dart";
 
-void testNoBody(int totalConnections, bool explicitContentLength) {
+Future<Null> testNoBody(int totalConnections, bool explicitContentLength) {
+  var completer = new Completer<Null>();
   int count = 0;
   HttpServer.bind("127.0.0.1", 0, backlog: totalConnections).then((server) {
     server.listen((HttpRequest request) {
@@ -19,6 +22,7 @@ void testNoBody(int totalConnections, bool explicitContentLength) {
         expect(error is HttpException, isTrue);
         if (++count == totalConnections) {
           server.close();
+          completer.complete(null);
         }
       });
       // write with content length 0 closes the connection and
@@ -53,9 +57,11 @@ void testNoBody(int totalConnections, bool explicitContentLength) {
       });
     }
   });
+  return completer.future;
 }
 
-void testBody(int totalConnections, bool useHeader) {
+Future<Null> testBody(int totalConnections, bool useHeader) {
+  var completer = new Completer<Null>();
   HttpServer.bind("127.0.0.1", 0, backlog: totalConnections).then((server) {
     int serverCount = 0;
     server.listen((HttpRequest request) {
@@ -80,9 +86,10 @@ void testBody(int totalConnections, bool useHeader) {
         response.done.then((_) {
           fail("Unexpected successful response completion");
         }).catchError((error) {
-          expect(error is HttpException, equals("[$error]"));
+          expect(error is HttpException, isTrue);
           if (++serverCount == totalConnections) {
             server.close();
+            completer.complete(null);
           }
         });
         response.close();
@@ -128,9 +135,11 @@ void testBody(int totalConnections, bool useHeader) {
       });
     }
   });
+  return completer.future;
 }
 
-void testBodyChunked(int totalConnections, bool useHeader) {
+Future<Null> testBodyChunked(int totalConnections, bool useHeader) {
+  var completer = new Completer<Null>();
   HttpServer.bind("127.0.0.1", 0, backlog: totalConnections).then((server) {
     server.listen((HttpRequest request) {
       expect(request.headers.value('content-length'), isNull);
@@ -190,6 +199,7 @@ void testBodyChunked(int totalConnections, bool useHeader) {
           if (++count == totalConnections) {
             client.close();
             server.close();
+            completer.complete(null);
           }
         });
       }).catchError((e, trace) {
@@ -199,9 +209,11 @@ void testBodyChunked(int totalConnections, bool useHeader) {
       });
     }
   });
+  return completer.future;
 }
 
-void testSetContentLength() {
+Future<Null> testSetContentLength() {
+  var completer = new Completer<Null>();
   HttpServer.bind("127.0.0.1", 0).then((server) {
     server.listen((HttpRequest request) {
       var response = request.response;
@@ -222,19 +234,20 @@ void testSetContentLength() {
       response.listen((_) {}, onDone: () {
         client.close();
         server.close();
+        completer.complete(null);
       });
     });
   });
+  return completer.future;
 }
 
 void main() {
-  testNoBody(5, false);
-  testNoBody(25, false);
-  testNoBody(5, true);
-  testNoBody(25, true);
-  testBody(5, false);
-  testBody(5, true);
-  testBodyChunked(5, false);
-  testBodyChunked(5, true);
-  testSetContentLength();
+  test('NoBody5', () => testNoBody(5, false));
+  test('NoBody25', () => testNoBody(25, false));
+  test('NoBody5Explicit', () => testNoBody(5, true));
+  test('NoBody25Explicit', () => testNoBody(25, true));
+  test('Body5', () => testBody(5, false));
+  test('BodyChunked5', () => testBodyChunked(5, false));
+  test('BodyChunked5UseHeader', () => testBodyChunked(5, true));
+  test('SetContentLength', () => testSetContentLength());
 }
