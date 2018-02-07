@@ -1,15 +1,14 @@
-// Copyright (c) 2017, the Dart project authors.  Please see the AUTHORS file
+// Copyright (c) 2013, the Dart project authors.  Please see the AUTHORS file
 // for details. All rights reserved. Use of this source code is governed by a
 // BSD-style license that can be found in the LICENSE file.
 
 import "dart:async";
-import "dart:io" hide HttpServer, HttpClient;
-
+import "dart:io" show InternetAddress;
 import "package:http_io/http_io.dart";
 import "package:test/test.dart";
 
 Future<Null> testHttpConnectionInfo() {
-  Completer<Null> completer = new Completer();
+  final completer = new Completer<Null>();
   HttpServer.bind("0.0.0.0", 0).then((server) {
     int clientPort;
 
@@ -39,7 +38,7 @@ Future<Null> testHttpConnectionInfo() {
       response.listen((_) {}, onDone: () {
         client.close();
         server.close();
-        completer.complete(null);
+        completer.complete();
       });
     });
   });
@@ -47,7 +46,5 @@ Future<Null> testHttpConnectionInfo() {
 }
 
 void main() {
-  test("HttpConnectionInfo", () async {
-    await testHttpConnectionInfo();
-  });
+  test('HttpConnectionInfo', () => testHttpConnectionInfo());
 }
