@@ -20,7 +20,7 @@ void setConnectionHeaders(HttpHeaders headers) {
   headers.add("My-Connection-Header2", "some-value2");
 }
 
-void checkexpectedConnectionHeaders(
+void checkExpectedConnectionHeaders(
     HttpHeaders headers, bool persistentConnection) {
   expect("some-value1", equals(headers.value("My-Connection-Header1")));
   expect("some-value2", equals(headers.value("My-Connection-Header2")));
@@ -51,7 +51,7 @@ Future<Null> headerTest(int totalConnections, bool clientPersistentConnection) {
       expect(clientPersistentConnection, equals(request.persistentConnection));
       expect(clientPersistentConnection,
           equals(request.response.persistentConnection));
-      checkexpectedConnectionHeaders(
+      checkExpectedConnectionHeaders(
           request.headers, request.persistentConnection);
 
       // Generate response. If the client signaled non-persistent
@@ -74,7 +74,7 @@ Future<Null> headerTest(int totalConnections, bool clientPersistentConnection) {
         return request.close();
       }).then((HttpClientResponse response) {
         expect(response.persistentConnection, isFalse);
-        checkexpectedConnectionHeaders(
+        checkExpectedConnectionHeaders(
             response.headers, response.persistentConnection);
         response.listen((_) {}, onDone: () {
           count++;
