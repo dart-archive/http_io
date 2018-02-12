@@ -51,8 +51,8 @@ void testServerRequest(void handler(server, request),
   });
 }
 
-Future<Null> testResponseDone() {
-  final completers = new List<Future<Null>>();
+Future<List> testResponseDone() {
+  final completers = new List<Future<List<Null>>>();
   final completer = new Completer<Null>();
   testServerRequest((server, request) {
     request.response.close();
@@ -90,10 +90,10 @@ Future<Null> testResponseDone() {
   return Future.wait(completers);
 }
 
-Future<Null> testResponseAddStream() {
+Future<List> testResponseAddStream() {
   File file = scriptSource;
   int bytes = file.lengthSync();
-  final completers = new List<Future<Null>>();
+  final completers = new List<Future<List<Null>>>();
   final completer = new Completer<Null>();
   testServerRequest((server, request) {
     request.response.addStream(file.openRead()).then((response) {
@@ -159,7 +159,8 @@ Future<Null> testResponseAddStream() {
   return Future.wait(completers);
 }
 
-void testResponseAddStreamClosed() {
+Future<Null> testResponseAddStreamClosed() {
+  final completer = new Completer<Null>();
   File file = scriptSource;
   testServerRequest((server, request) {
     request.response.addStream(file.openRead()).then((response) {
@@ -178,18 +179,22 @@ void testResponseAddStreamClosed() {
           write();
         } else {
           response.close();
-          response.done.then((_) => server.close());
+          response.done.then((_) {
+            server.close();
+            completer.complete();
+          });
         }
       });
     }
 
     write();
   }, closeClient: true);
+  return completer.future;
 }
 
-Future<Null> testResponseAddClosed() {
+Future<List> testResponseAddClosed() {
   File file = scriptSource;
-  final completers = new List<Future<Null>>();
+  final completers = new List<Future<List<Null>>>();
 
   final completer = new Completer<Null>();
   testServerRequest((server, request) {
@@ -240,8 +245,8 @@ Future<Null> testResponseAddClosed() {
   return Future.wait(completers);
 }
 
-Future<Null> testBadResponseAdd() {
-  final completers = new List<Future<Null>>();
+Future<List> testBadResponseAdd() {
+  final completers = new List<Future<List<Null>>>();
   final completer = new Completer<Null>();
   testServerRequest((server, request) {
     request.response.contentLength = 0;
@@ -283,8 +288,8 @@ Future<Null> testBadResponseAdd() {
   return Future.wait(completers);
 }
 
-Future<Null> testBadResponseClose() {
-  final completers = new List<Future<Null>>();
+Future<List> testBadResponseClose() {
+  final completers = new List<Future<List<Null>>>();
   final completer = new Completer<Null>();
   testServerRequest((server, request) {
     request.response.contentLength = 5;
