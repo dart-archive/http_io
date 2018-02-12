@@ -78,6 +78,8 @@ class HttpSessionImpl implements HttpSession {
     _data.addEntries(entries);
   }
 
+  Iterable<MapEntry> get entries => _data.entries;
+
   Map<K, V> map<K, V>(MapEntry<K, V> transform(key, value)) =>
       _data.map(transform);
 
