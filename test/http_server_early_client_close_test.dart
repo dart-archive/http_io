@@ -22,8 +22,7 @@ Future sendData(List<int> data, int port) {
 }
 
 class EarlyCloseTest {
-  EarlyCloseTest(this.data,
-      [String this.exception, bool this.expectRequest = false]);
+  EarlyCloseTest(this.data, [this.exception, this.expectRequest = false]);
 
   Future execute() {
     return HttpServer.bind("127.0.0.1", 0).then((server) {
@@ -31,7 +30,6 @@ class EarlyCloseTest {
 
       bool calledOnRequest = false;
       bool calledOnError = false;
-      bool calledOnDone = false;
       ReceivePort port = new ReceivePort();
       var requestCompleter = new Completer();
       server.listen((request) {
@@ -49,7 +47,6 @@ class EarlyCloseTest {
         });
       }, onDone: () {
         expect(expectRequest, equals(calledOnRequest));
-        calledOnDone = true;
         if (exception == null) port.close();
         c.complete(null);
       });
@@ -67,7 +64,7 @@ class EarlyCloseTest {
     });
   }
 
-  final data;
+  final dynamic data;
   final String exception;
   final bool expectRequest;
 }
