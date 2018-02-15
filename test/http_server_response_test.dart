@@ -3,7 +3,7 @@
 // BSD-style license that can be found in the LICENSE file.
 
 import "dart:async";
-import "dart:io" show File, Platform;
+import "dart:io" show Directory, File, Platform;
 import "dart:typed_data";
 
 import "package:http_io/http_io.dart";
@@ -11,8 +11,7 @@ import "package:test/test.dart";
 
 // Platform.script may refer to a AOT or JIT snapshot, which are significantly
 // larger.
-File scriptSource = new File(
-    Platform.script.resolve("http_server_response_test.dart").toFilePath());
+File scriptSource;
 
 void testServerRequest(void handler(server, request),
     {int bytes, bool closeClient}) {
@@ -52,7 +51,7 @@ void testServerRequest(void handler(server, request),
 }
 
 Future<List> testResponseDone() {
-  final completers = new List<Future<List<Null>>>();
+  final completers = new List<Future<Null>>();
   final completer = new Completer<Null>();
   testServerRequest((server, request) {
     request.response.close();
@@ -93,7 +92,7 @@ Future<List> testResponseDone() {
 Future<List> testResponseAddStream() {
   File file = scriptSource;
   int bytes = file.lengthSync();
-  final completers = new List<Future<List<Null>>>();
+  final completers = new List<Future<Null>>();
   final completer = new Completer<Null>();
   testServerRequest((server, request) {
     request.response.addStream(file.openRead()).then((response) {
@@ -194,7 +193,7 @@ Future<Null> testResponseAddStreamClosed() {
 
 Future<List> testResponseAddClosed() {
   File file = scriptSource;
-  final completers = new List<Future<List<Null>>>();
+  final completers = new List<Future<Null>>();
 
   final completer = new Completer<Null>();
   testServerRequest((server, request) {
@@ -246,7 +245,7 @@ Future<List> testResponseAddClosed() {
 }
 
 Future<List> testBadResponseAdd() {
-  final completers = new List<Future<List<Null>>>();
+  final completers = new List<Future<Null>>();
   final completer = new Completer<Null>();
   testServerRequest((server, request) {
     request.response.contentLength = 0;
@@ -289,7 +288,7 @@ Future<List> testBadResponseAdd() {
 }
 
 Future<List> testBadResponseClose() {
-  final completers = new List<Future<List<Null>>>();
+  final completers = new List<Future<Null>>();
   final completer = new Completer<Null>();
   testServerRequest((server, request) {
     request.response.contentLength = 5;
@@ -355,6 +354,14 @@ Future<Null> testWriteCharCode() {
 }
 
 void main() {
+  scriptSource =
+      new File('${Directory.current.path}/test/http_server_response_test.dart');
+  if (!scriptSource.existsSync()) {
+    // If we can't find the file relative to the cwd, then look relative
+    // to Platform.script.
+    scriptSource = new File(
+        Platform.script.resolve('http_server_response_test.dart').toFilePath());
+  }
   test('responseDone', () => testResponseDone());
   test('responseAddStream', () => testResponseAddStream());
   test('responseAddStreamClosed', () => testResponseAddStreamClosed());
