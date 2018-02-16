@@ -8,8 +8,7 @@ import 'package:http_io/http_io.dart';
 import 'package:test/test.dart';
 
 Future<HttpServer> setupServer() {
-  Completer completer = new Completer();
-  HttpServer.bind("127.0.0.1", 0).then((server) {
+  return HttpServer.bind("127.0.0.1", 0).then((server) {
     var handlers = new Map<String, Function>();
     addRequestHandler(
         String path, void handler(HttpRequest request, HttpResponse response)) {
@@ -176,10 +175,8 @@ Future<HttpServer> setupServer() {
       response.persistentConnection = false;
       response.close();
     });
-
-    completer.complete(server);
+    return server;
   });
-  return completer.future;
 }
 
 void checkRedirects(int redirectCount, HttpClientResponse response) {
@@ -399,7 +396,7 @@ Future<Null> testRedirectClosingConnection() {
   return completer.future;
 }
 
-Future<List> testRedirectRelativeUrl() {
+Future<Null> testRedirectRelativeUrl() async {
   Future<Null> testPath(String path) {
     final completer = new Completer<Null>();
     setupServer().then((server) {
@@ -420,14 +417,12 @@ Future<List> testRedirectRelativeUrl() {
     return completer.future;
   }
 
-  final futures = <Future<Null>>[];
-  futures.add(testPath("/redirectUrl"));
-  futures.add(testPath("/some/redirectUrl"));
-  futures.add(testPath("/redirectUrl2"));
-  futures.add(testPath("/redirectUrl3"));
-  futures.add(testPath("/redirectUrl4"));
-  futures.add(testPath("/redirectUrl5"));
-  return Future.wait(futures);
+  await testPath("/redirectUrl");
+  await testPath("/some/redirectUrl");
+  await testPath("/redirectUrl2");
+  await testPath("/redirectUrl3");
+  await testPath("/redirectUrl4");
+  await testPath("/redirectUrl5");
 }
 
 Future<Null> testRedirectRelativeToAbsolute() {
