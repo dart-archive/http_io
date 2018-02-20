@@ -4,14 +4,20 @@
 
 import 'dart:async';
 import 'dart:convert';
-import 'dart:io' show Platform, SecurityContext, Socket;
+import 'dart:io' show Directory, File, Platform, SecurityContext, Socket;
 
 import 'package:convert/convert.dart';
 import 'package:crypto/crypto.dart';
 import 'package:http_io/http_io.dart';
 import 'package:test/test.dart';
 
-String localFile(path) => Platform.script.resolve(path).toFilePath();
+String localFile(path) {
+  final localPath = "${Directory.current.path}/test/$path";
+  if (!(new File(localPath).existsSync())) {
+    return Platform.script.resolve(path).toFilePath();
+  }
+  return localPath;
+}
 
 final SecurityContext serverContext = new SecurityContext()
   ..useCertificateChain(localFile('certificates/server_chain.pem'))
