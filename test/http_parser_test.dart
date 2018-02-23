@@ -9,7 +9,7 @@ import "dart:isolate";
 import "dart:math";
 import "dart:typed_data";
 
-import 'package:http_io/src/http_headers_impl.dart';
+import 'package:http_io/http_io.dart';
 import 'package:http_io/src/http_parser.dart';
 import 'package:test/test.dart';
 
@@ -40,7 +40,7 @@ class HttpParserTest {
 
       String method;
       Uri uri;
-      HttpHeadersImpl headers;
+      HttpHeaders headers;
       int bytesReceived;
       int unparsedBytesReceived;
       bool upgraded;
@@ -214,7 +214,7 @@ class HttpParserTest {
       bool dataEndClose;
       int statusCode;
       String reasonPhrase;
-      HttpHeadersImpl headers;
+      HttpHeaders headers;
       int bytesReceived;
       httpParser = new HttpParser.responseParser();
       controller = new StreamController(sync: true);
