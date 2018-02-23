@@ -537,6 +537,11 @@ abstract class HttpHeaders {
   int port;
 
   /**
+   * Gets the protocol version for the connection.
+   */
+  String get protocolVersion;
+
+  /**
    * Gets and sets the content type. Note that the content type in the
    * header will only be updated if this field is set
    * directly. Mutating the returned current value will have no
