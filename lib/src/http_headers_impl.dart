@@ -14,7 +14,7 @@ import 'http_exception.dart';
 
 class HttpHeadersImpl implements HttpHeaders {
   final Map<String, List<String>> headers;
-  final String _protocolVersion;
+  final String protocolVersion;
 
   bool mutable = true; // Are the headers currently mutable?
   List<String> _noFoldingHeaders;
@@ -27,7 +27,7 @@ class HttpHeadersImpl implements HttpHeaders {
 
   final int _defaultPortForScheme;
 
-  HttpHeadersImpl(this._protocolVersion,
+  HttpHeadersImpl(this.protocolVersion,
       {int defaultPortForScheme: HttpClient.DEFAULT_HTTP_PORT,
       HttpHeadersImpl initialHeaders})
       : headers = new HashMap<String, List<String>>(),
@@ -40,7 +40,7 @@ class HttpHeadersImpl implements HttpHeaders {
       _host = initialHeaders._host;
       _port = initialHeaders._port;
     }
-    if (_protocolVersion == "1.0") {
+    if (protocolVersion == "1.0") {
       _persistentConnection = false;
       _chunkedTransferEncoding = false;
     }
@@ -122,7 +122,7 @@ class HttpHeadersImpl implements HttpHeaders {
     _checkMutable();
     if (persistentConnection == _persistentConnection) return;
     if (persistentConnection) {
-      if (_protocolVersion == "1.1") {
+      if (protocolVersion == "1.1") {
         remove(HttpHeaders.CONNECTION, "close");
       } else {
         if (_contentLength == -1) {
@@ -133,7 +133,7 @@ class HttpHeadersImpl implements HttpHeaders {
         add(HttpHeaders.CONNECTION, "keep-alive");
       }
     } else {
-      if (_protocolVersion == "1.1") {
+      if (protocolVersion == "1.1") {
         add(HttpHeaders.CONNECTION, "close");
       } else {
         remove(HttpHeaders.CONNECTION, "keep-alive");
@@ -146,7 +146,7 @@ class HttpHeadersImpl implements HttpHeaders {
 
   void set contentLength(int contentLength) {
     _checkMutable();
-    if (_protocolVersion == "1.0" &&
+    if (protocolVersion == "1.0" &&
         persistentConnection &&
         contentLength == -1) {
       throw new HttpException(
@@ -160,7 +160,7 @@ class HttpHeadersImpl implements HttpHeaders {
       _set(HttpHeaders.CONTENT_LENGTH, contentLength.toString());
     } else {
       removeAll(HttpHeaders.CONTENT_LENGTH);
-      if (_protocolVersion == "1.1") {
+      if (protocolVersion == "1.1") {
         chunkedTransferEncoding = true;
       }
     }
@@ -170,7 +170,7 @@ class HttpHeadersImpl implements HttpHeaders {
 
   void set chunkedTransferEncoding(bool chunkedTransferEncoding) {
     _checkMutable();
-    if (chunkedTransferEncoding && _protocolVersion == "1.0") {
+    if (chunkedTransferEncoding && protocolVersion == "1.0") {
       throw new HttpException(
           "Trying to set 'Transfer-Encoding: Chunked' on HTTP 1.0 headers");
     }
@@ -204,8 +204,6 @@ class HttpHeadersImpl implements HttpHeaders {
     _port = port;
     _updateHostHeader();
   }
-
-  String get protocolVersion => _protocolVersion;
 
   DateTime get ifModifiedSince {
     List<String> values = headers[HttpHeaders.IF_MODIFIED_SINCE];

@@ -539,7 +539,7 @@ abstract class HttpHeaders {
   /**
    * Gets the protocol version for the connection.
    */
-  String get protocolVersion;
+  String protocolVersion;
 
   /**
    * Gets and sets the content type. Note that the content type in the
