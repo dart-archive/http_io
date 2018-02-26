@@ -1,5 +1,5 @@
 language: dart
-sudo: false
+sudo: true
 
 # Travis CI Issue: https://github.com/travis-ci/travis-ci/issues/8711
 # Docker disables IPv6 in containers by default. Enable it for unit tests that need [::1].
