@@ -7,9 +7,9 @@ import 'dart:async';
 import 'package:http_io/http_io.dart';
 import 'package:test/test.dart';
 
-Future<Null> testHEAD(int totalConnections) {
+Future<Null> testHEAD(int totalConnections) async {
   final completer = new Completer<Null>();
-  HttpServer.bind("127.0.0.1", 0).then((server) {
+  HttpServer.bind("127.0.0.1", 0).then((server) async {
     server.listen((request) {
       var response = request.response;
       if (request.uri.path == "/test100") {
@@ -48,7 +48,7 @@ Future<Null> testHEAD(int totalConnections) {
 
     for (int i = 0; i < totalConnections; i++) {
       int len = (i % 2 == 0) ? 100 : 200;
-      client
+      await client
           .open("HEAD", "127.0.0.1", server.port, "/test$len")
           .then((request) => request.close())
           .then((HttpClientResponse response) {
@@ -57,7 +57,7 @@ Future<Null> testHEAD(int totalConnections) {
             onDone: requestDone);
       });
 
-      client
+      await client
           .open("HEAD", "127.0.0.1", server.port, "/testChunked$len")
           .then((request) => request.close())
           .then((HttpClientResponse response) {
