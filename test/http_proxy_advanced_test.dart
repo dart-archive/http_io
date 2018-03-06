@@ -212,7 +212,6 @@ class ProxyServer {
               var digest = md5.convert("${request.method}:${uri}".codeUnits);
               var ha2 = hex.encode(digest.bytes);
 
-              var x;
               if (qop == null || qop == "" || qop == "none") {
                 digest = md5.convert("$ha1:${nonce}:$ha2".codeUnits);
               } else {
