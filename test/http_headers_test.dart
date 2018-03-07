@@ -43,9 +43,9 @@ void testMultiValue() {
 }
 
 void testDate() {
-  DateTime date1 = new DateTime.utc(1999, DateTime.june, 11, 18, 46, 53, 0);
+  DateTime date1 = new DateTime.utc(1999, DateTime.JUNE, 11, 18, 46, 53, 0);
   String httpDate1 = "Fri, 11 Jun 1999 18:46:53 GMT";
-  DateTime date2 = new DateTime.utc(2000, DateTime.august, 16, 12, 34, 56, 0);
+  DateTime date2 = new DateTime.utc(2000, DateTime.AUGUST, 16, 12, 34, 56, 0);
   String httpDate2 = "Wed, 16 Aug 2000 12:34:56 GMT";
 
   HttpHeadersImpl headers = new HttpHeadersImpl("1.1");
@@ -69,9 +69,9 @@ void testDate() {
 }
 
 void testExpires() {
-  DateTime date1 = new DateTime.utc(1999, DateTime.june, 11, 18, 46, 53, 0);
+  DateTime date1 = new DateTime.utc(1999, DateTime.JUNE, 11, 18, 46, 53, 0);
   String httpDate1 = "Fri, 11 Jun 1999 18:46:53 GMT";
-  DateTime date2 = new DateTime.utc(2000, DateTime.august, 16, 12, 34, 56, 0);
+  DateTime date2 = new DateTime.utc(2000, DateTime.AUGUST, 16, 12, 34, 56, 0);
   String httpDate2 = "Wed, 16 Aug 2000 12:34:56 GMT";
 
   HttpHeadersImpl headers = new HttpHeadersImpl("1.1");
@@ -95,9 +95,9 @@ void testExpires() {
 }
 
 void testIfModifiedSince() {
-  DateTime date1 = new DateTime.utc(1999, DateTime.june, 11, 18, 46, 53, 0);
+  DateTime date1 = new DateTime.utc(1999, DateTime.JUNE, 11, 18, 46, 53, 0);
   String httpDate1 = "Fri, 11 Jun 1999 18:46:53 GMT";
-  DateTime date2 = new DateTime.utc(2000, DateTime.august, 16, 12, 34, 56, 0);
+  DateTime date2 = new DateTime.utc(2000, DateTime.AUGUST, 16, 12, 34, 56, 0);
   String httpDate2 = "Wed, 16 Aug 2000 12:34:56 GMT";
 
   HttpHeadersImpl headers = new HttpHeadersImpl("1.1");
@@ -394,7 +394,7 @@ void testCookie() {
     Cookie cookie;
     cookie = new Cookie(name, value);
     expect("$name=$value; HttpOnly", cookie.toString());
-    DateTime date = new DateTime.utc(2014, DateTime.january, 5, 23, 59, 59, 0);
+    DateTime date = new DateTime.utc(2014, DateTime.JANUARY, 5, 23, 59, 59, 0);
     cookie.expires = date;
     checkCookie(
         cookie,
