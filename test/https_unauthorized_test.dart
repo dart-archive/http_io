@@ -7,7 +7,14 @@
 
 import "dart:async";
 import 'dart:io'
-    show HandshakeException, SecurityContext, Platform, Process, ProcessResult;
+    show
+        Directory,
+        File,
+        HandshakeException,
+        Platform,
+        Process,
+        ProcessResult,
+        SecurityContext;
 
 import 'package:http_io/http_io.dart';
 import "package:test/test.dart";
@@ -15,7 +22,15 @@ import "package:test/test.dart";
 const HOST_NAME = "localhost";
 const CERTIFICATE = "localhost_cert";
 
-String localFile(path) => Platform.script.resolve(path).toFilePath();
+String localFile(path) {
+  var script = "${Directory.current.path}/test/$path";
+  if (!(new File(script)).existsSync()) {
+    // If we can't find the file relative to the cwd, then look relative to
+    // Platform.script.
+    script = Platform.script.resolve(path).toFilePath();
+  }
+  return script;
+}
 
 SecurityContext untrustedServerContext = new SecurityContext()
   ..useCertificateChain(localFile('certificates/untrusted_server_chain.pem'))
