@@ -906,7 +906,7 @@ class CookieImpl implements Cookie {
           value = parseAttributeValue();
         }
         if (name == "expires") {
-          expires = _parseCookieDate(value);
+          expires = parseCookieDate(value);
         } else if (name == "max-age") {
           maxAge = int.parse(value);
         } else if (name == "domain") {
@@ -998,7 +998,7 @@ class CookieImpl implements Cookie {
 }
 
 // Parse a cookie date string.
-DateTime _parseCookieDate(String date) {
+DateTime parseCookieDate(String date) {
   const List monthsLowerCase = const [
     "jan",
     "feb",

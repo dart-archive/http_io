@@ -32,7 +32,7 @@ import 'dart:typed_data';
 import 'src/char_code.dart';
 import 'src/crypto.dart';
 import 'src/http_exception.dart';
-import 'src/http_headers_impl.dart';
+import 'src/http_headers_impl.dart' hide parseCookieDate;
 import 'src/http_incoming.dart';
 import 'src/http_parser.dart';
 import 'src/http_session.dart';
