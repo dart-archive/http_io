@@ -1586,7 +1586,7 @@ class _HttpClientConnection {
       // If the proxy configuration contains user information use that
       // for proxy basic authorization.
       String auth = CryptoUtils
-          .bytesToBase64(UTF8.encode("${proxy.username}:${proxy.password}"));
+          .bytesToBase64(utf8.encode("${proxy.username}:${proxy.password}"));
       request.headers.set(HttpHeaders.PROXY_AUTHORIZATION, "Basic $auth");
     } else if (!proxy.isDirect && _httpClient._proxyCredentials.isNotEmpty) {
       proxyCreds = _httpClient._findProxyCredentials(proxy);
@@ -1597,7 +1597,7 @@ class _HttpClientConnection {
     if (uri.userInfo != null && uri.userInfo.isNotEmpty) {
       // If the URL contains user information use that for basic
       // authorization.
-      String auth = CryptoUtils.bytesToBase64(UTF8.encode(uri.userInfo));
+      String auth = CryptoUtils.bytesToBase64(utf8.encode(uri.userInfo));
       request.headers.set(HttpHeaders.AUTHORIZATION, "Basic $auth");
     } else {
       // Look for credentials.
@@ -1708,7 +1708,7 @@ class _HttpClientConnection {
       // If the proxy configuration contains user information use that
       // for proxy basic authorization.
       String auth = CryptoUtils
-          .bytesToBase64(UTF8.encode("${proxy.username}:${proxy.password}"));
+          .bytesToBase64(utf8.encode("${proxy.username}:${proxy.password}"));
       request.headers.set(HttpHeaders.PROXY_AUTHORIZATION, "Basic $auth");
     }
     return request.close().then((response) {
@@ -2783,11 +2783,11 @@ abstract class _Credentials {
       // now always use UTF-8 encoding.
       _HttpClientDigestCredentials creds = credentials;
       var hasher = new MD5()
-        ..add(UTF8.encode(creds.username))
+        ..add(utf8.encode(creds.username))
         ..add([CharCode.COLON])
         ..add(realm.codeUnits)
         ..add([CharCode.COLON])
-        ..add(UTF8.encode(creds.password));
+        ..add(utf8.encode(creds.password));
       ha1 = CryptoUtils.bytesToHex(hasher.close());
     }
   }
@@ -2869,7 +2869,7 @@ class _HttpClientBasicCredentials extends _HttpClientCredentials
     // Proxy-Authenticate headers, see
     // http://tools.ietf.org/html/draft-reschke-basicauth-enc-06. For
     // now always use UTF-8 encoding.
-    String auth = CryptoUtils.bytesToBase64(UTF8.encode("$username:$password"));
+    String auth = CryptoUtils.bytesToBase64(utf8.encode("$username:$password"));
     return "Basic $auth";
   }
 

@@ -238,7 +238,7 @@ Future<Null> testNoBuffer() {
         .then((request) => request.close())
         .then((clientResponse) {
       var iterator = new StreamIterator(
-          clientResponse.transform(UTF8.decoder).transform(new LineSplitter()));
+          clientResponse.transform(utf8.decoder).transform(new LineSplitter()));
       iterator.moveNext().then((hasValue) {
         expect(hasValue, isTrue);
         expect('init', equals(iterator.current));
