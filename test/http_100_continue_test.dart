@@ -69,12 +69,12 @@ Content-Length: 2\r
 AB''';
 
   test("Continue OK", () async {
-    await doTest(ASCII.encode(r1), 0);
+    await doTest(ascii.encode(r1), 0);
   });
   test("Continue hello world OK", () async {
-    await doTest(ASCII.encode(r2), 0);
+    await doTest(ascii.encode(r2), 0);
   });
   test("Continue OK length AB", () async {
-    await doTest(ASCII.encode(r3), 2);
+    await doTest(ascii.encode(r3), 2);
   });
 }

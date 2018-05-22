@@ -9,7 +9,6 @@ before_script:
     fi
 
 dart:
-  - stable
   - dev
 
 dart_task:

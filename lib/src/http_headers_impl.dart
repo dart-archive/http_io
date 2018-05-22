@@ -596,7 +596,7 @@ class HttpHeadersImpl implements HttpHeaders {
     for (var i = 0; i < field.length; i++) {
       if (!CharCode.isTokenChar(field.codeUnitAt(i))) {
         throw new FormatException(
-            "Invalid HTTP header field name: ${JSON.encode(field)}");
+            "Invalid HTTP header field name: ${jsonEncode(field)}");
       }
     }
     return field.toLowerCase();
@@ -607,7 +607,7 @@ class HttpHeadersImpl implements HttpHeaders {
       for (var i = 0; i < value.length; i++) {
         if (!CharCode.isValueChar(value.codeUnitAt(i))) {
           throw new FormatException(
-              "Invalid HTTP header field value: ${JSON.encode(value)}");
+              "Invalid HTTP header field value: ${jsonEncode(value)}");
         }
       }
     }
