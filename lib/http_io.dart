@@ -11,7 +11,7 @@ import 'dart:convert';
 import 'dart:io'
     show
         BytesBuilder,
-        GZIP,
+        gzip,
         HandshakeException,
         InternetAddress,
         IOSink,
@@ -64,7 +64,7 @@ part 'src/http_overrides.dart';
  *
  *     main() {
  *       HttpServer
- *           .bind(InternetAddress.ANY_IP_V6, 80)
+ *           .bind(InternetAddress.anyIpV6, 80)
  *           .then((server) {
  *             server.listen((HttpRequest request) {
  *               request.response.write('Hello, world!');
@@ -105,7 +105,7 @@ part 'src/http_overrides.dart';
  *       context.usePrivateKey(key, password: 'dartdart');
  *
  *       HttpServer
- *           .bindSecure(InternetAddress.ANY_IP_V6,
+ *           .bindSecure(InternetAddress.anyIpV6,
  *                       443,
  *                       context)
  *           .then((server) {
@@ -127,7 +127,7 @@ part 'src/http_overrides.dart';
  *     import 'dart:io';
  *
  *     main() {
- *       ServerSocket.bind(InternetAddress.ANY_IP_V6, 80)
+ *       ServerSocket.bind(InternetAddress.anyIpV6, 80)
  *         .then((serverSocket) {
  *           HttpServer httpserver = new HttpServer.listenOn(serverSocket);
  *           serverSocket.listen((Socket socket) {
@@ -209,17 +209,17 @@ abstract class HttpServer implements Stream<HttpRequest> {
    * perform a [InternetAddress.lookup] and use the first value in the
    * list. To listen on the loopback adapter, which will allow only
    * incoming connections from the local host, use the value
-   * [InternetAddress.LOOPBACK_IP_V4] or
-   * [InternetAddress.LOOPBACK_IP_V6]. To allow for incoming
+   * [InternetAddress.loopbackIpV4] or
+   * [InternetAddress.loopbackIpV6]. To allow for incoming
    * connection from the network use either one of the values
-   * [InternetAddress.ANY_IP_V4] or [InternetAddress.ANY_IP_V6] to
+   * [InternetAddress.anyIpV4] or [InternetAddress.anyIpV6] to
    * bind to all interfaces or the IP address of a specific interface.
    *
    * If an IP version 6 (IPv6) address is used, both IP version 6
    * (IPv6) and version 4 (IPv4) connections will be accepted. To
    * restrict this to version 6 (IPv6) only, use [v6Only] to set
    * version 6 only. However, if the address is
-   * [InternetAddress.LOOPBACK_IP_V6], only IP version 6 (IPv6) connections
+   * [InternetAddress.loopbackIpV6], only IP version 6 (IPv6) connections
    * will be accepted.
    *
    * If [port] has the value [:0:] an ephemeral port will be chosen by
@@ -248,10 +248,10 @@ abstract class HttpServer implements Stream<HttpRequest> {
    * perform a [InternetAddress.lookup] and use the first value in the
    * list. To listen on the loopback adapter, which will allow only
    * incoming connections from the local host, use the value
-   * [InternetAddress.LOOPBACK_IP_V4] or
-   * [InternetAddress.LOOPBACK_IP_V6]. To allow for incoming
+   * [InternetAddress.loopbackIpV4] or
+   * [InternetAddress.loopbackIpV6]. To allow for incoming
    * connection from the network use either one of the values
-   * [InternetAddress.ANY_IP_V4] or [InternetAddress.ANY_IP_V6] to
+   * [InternetAddress.anyIpV4] or [InternetAddress.anyIpV6] to
    * bind to all interfaces or the IP address of a specific interface.
    *
    * If an IP version 6 (IPv6) address is used, both IP version 6
@@ -884,7 +884,7 @@ abstract class Cookie {
  * for HTTP requests. When the server receives a request,
  * it uses the HttpRequest object's `method` property to dispatch requests.
  *
- *     final HOST = InternetAddress.LOOPBACK_IP_V4;
+ *     final HOST = InternetAddress.loopbackIpV4;
  *     final PORT = 80;
  *
  *     HttpServer.bind(HOST, PORT).then((_server) {

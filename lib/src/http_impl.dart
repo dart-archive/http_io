@@ -308,7 +308,7 @@ class _HttpClientResponse extends _HttpInboundMessage
     Stream<List<int>> stream = _incoming;
     if (_httpClient.autoUncompress &&
         headers.value(HttpHeaders.CONTENT_ENCODING) == "gzip") {
-      stream = stream.transform(GZIP.decoder);
+      stream = stream.transform(gzip.decoder);
     }
     return stream.listen(onData,
         onError: onError, onDone: onDone, cancelOnError: cancelOnError);
@@ -1853,7 +1853,7 @@ class _ConnectionTarget {
     _connecting++;
     return socketFuture.then((socket) {
       _connecting--;
-      socket.setOption(SocketOption.TCP_NODELAY, true);
+      socket.setOption(SocketOption.tcpNodelay, true);
       var connection =
           new _HttpClientConnection(key, socket, client, false, context);
       if (isSecure && !proxy.isDirect) {
@@ -2439,7 +2439,7 @@ class _HttpServer extends Stream<HttpRequest> implements HttpServer {
   StreamSubscription<HttpRequest> listen(void onData(HttpRequest event),
       {Function onError, void onDone(), bool cancelOnError}) {
     _serverSocket.listen((Socket socket) {
-      socket.setOption(SocketOption.TCP_NODELAY, true);
+      socket.setOption(SocketOption.tcpNodelay, true);
       // Accept the client connection.
       _HttpConnection connection = new _HttpConnection(socket, this);
       _idleConnections.add(connection);

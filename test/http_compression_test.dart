@@ -32,7 +32,7 @@ Future<Null> testWithData(List<int> data, {bool clientAutoUncompress: true}) {
         if (clientAutoUncompress) {
           expect(data, equals(list));
         } else {
-          expect(data, equals(GZIP.decode(list)));
+          expect(data, equals(gzip.decode(list)));
         }
         server.close();
         client.close();
