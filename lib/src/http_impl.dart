@@ -1853,7 +1853,7 @@ class _ConnectionTarget {
     _connecting++;
     return socketFuture.then((socket) {
       _connecting--;
-      socket.setOption(SocketOption.tcpNodelay, true);
+      socket.setOption(SocketOption.tcpNoDelay, true);
       var connection =
           new _HttpClientConnection(key, socket, client, false, context);
       if (isSecure && !proxy.isDirect) {
@@ -2439,7 +2439,7 @@ class _HttpServer extends Stream<HttpRequest> implements HttpServer {
   StreamSubscription<HttpRequest> listen(void onData(HttpRequest event),
       {Function onError, void onDone(), bool cancelOnError}) {
     _serverSocket.listen((Socket socket) {
-      socket.setOption(SocketOption.tcpNodelay, true);
+      socket.setOption(SocketOption.tcpNoDelay, true);
       // Accept the client connection.
       _HttpConnection connection = new _HttpConnection(socket, this);
       _idleConnections.add(connection);
