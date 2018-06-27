@@ -25,7 +25,7 @@ Future<Null> testWithData(List<int> data, {bool clientAutoUncompress: true}) {
     }).then((response) {
       expect(
           "gzip", equals(response.headers.value(HttpHeaders.CONTENT_ENCODING)));
-      response.fold([], (list, b) {
+      response.fold(<int>[], (list, b) {
         list.addAll(b);
         return list;
       }).then((list) {

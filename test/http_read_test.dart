@@ -53,7 +53,7 @@ class IsolatedHttpServer {
 
   ReceivePort _statusPort; // Port for receiving messages from the server.
   SendPort _serverPort; // Port for sending messages to the server.
-  var _startedCallback;
+  void Function(int) _startedCallback;
 }
 
 class IsolatedHttpServerCommand {
@@ -145,8 +145,6 @@ class TestServer {
       _server.close();
       _dispatchPort.close();
       replyTo.send(new IsolatedHttpServerStatus.stopped());
-    } else if (command.isChunkedEncoding) {
-      _chunkedEncoding = true;
     }
   }
 
@@ -162,7 +160,6 @@ class TestServer {
   HttpServer _server; // HTTP server instance.
   ReceivePort _dispatchPort;
   Map _requestHandlers;
-  bool _chunkedEncoding = false;
 }
 
 Future<Null> testRead(bool chunkedEncoding) {

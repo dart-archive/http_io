@@ -168,7 +168,7 @@ Future<Null> testBasicAuthenticateCallback() {
       String username = url.path.substring(1, 6);
       String password = url.path.substring(1, 6);
       if (passwordChanged) password = "${password}1";
-      Completer completer = new Completer();
+      Completer<bool> completer = new Completer<bool>();
       new Timer(const Duration(milliseconds: 10), () {
         client.addCredentials(
             url, realm, new HttpClientBasicCredentials(username, password));

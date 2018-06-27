@@ -9,7 +9,7 @@ import 'package:http_io/src/http_headers_impl.dart';
 import 'package:test/test.dart';
 
 void testParseHttpCookieDate() {
-  expect(() => parseCookieDate(""), throwsA(new isInstanceOf<HttpException>()));
+  expect(() => parseCookieDate(""), throwsA(new TypeMatcher<HttpException>()));
 
   test(int year, int month, int day, int hours, int minutes, int seconds,
       String formatted) {

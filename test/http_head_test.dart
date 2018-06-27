@@ -7,7 +7,7 @@ import 'dart:async';
 import 'package:http_io/http_io.dart';
 import 'package:test/test.dart';
 
-Future<Null> testHEAD(int totalConnections) async {
+Future<Null> testHEAD(int totalConnections) {
   final completer = new Completer<Null>();
   HttpServer.bind("127.0.0.1", 0).then((server) async {
     server.listen((request) {

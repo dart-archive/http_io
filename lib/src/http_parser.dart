@@ -765,7 +765,7 @@ class HttpParser extends Stream<HttpIncoming> {
     }
   }
 
-  void _onData(Uint8List buffer) {
+  void _onData(List<int> buffer) {
     _socketSubscription.pause();
     assert(_buffer == null);
     _buffer = buffer;

@@ -41,8 +41,7 @@ SecurityContext clientContext = new SecurityContext()
   ..setTrustedCertificates(localFile('certificates/trusted_certs.pem'));
 
 Future<HttpServer> runServer() {
-  return HttpServer
-      .bindSecure(HOST_NAME, 0, untrustedServerContext, backlog: 5)
+  return HttpServer.bindSecure(HOST_NAME, 0, untrustedServerContext, backlog: 5)
       .then((server) {
     server.listen((HttpRequest request) {
       request.listen((_) {}, onDone: () {
@@ -59,9 +58,8 @@ Future<Null> runTest() {
   final completer = new Completer<Null>();
   var clientScript = localFile('https_unauthorized_client.dart');
   Future clientProcess(int port) {
-    return Process
-        .run(Platform.executable, [clientScript, port.toString()]).then(
-            (ProcessResult result) {
+    return Process.run(Platform.executable, [clientScript, port.toString()])
+        .then((ProcessResult result) {
       if (result.exitCode != 0 || !result.stdout.contains('SUCCESS')) {
         print("Client failed");
         print("  stdout:");

@@ -442,8 +442,8 @@ Future<Null> testRedirectRelativeToAbsolute() {
     }
 
     client
-        .getUrl(Uri
-            .parse("http://127.0.0.1:${server.port}/some/relativeToAbsolute"))
+        .getUrl(Uri.parse(
+            "http://127.0.0.1:${server.port}/some/relativeToAbsolute"))
         .then((HttpClientRequest request) {
       request.followRedirects = false;
       return request.close();

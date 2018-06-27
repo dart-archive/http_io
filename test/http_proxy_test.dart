@@ -38,8 +38,9 @@ class Server {
 
   Future<Server> start() {
     return (secure
-        ? HttpServer.bindSecure("localhost", 0, serverContext)
-        : HttpServer.bind("localhost", 0)).then((s) {
+            ? HttpServer.bindSecure("localhost", 0, serverContext)
+            : HttpServer.bind("localhost", 0))
+        .then((s) {
       server = s;
       server.listen(requestHandler);
       return this;
@@ -99,7 +100,7 @@ class ProxyServer {
   String username;
   String password;
 
-  var ha1;
+  String ha1;
   String serverAlgorithm = "MD5";
   String serverQop = "auth";
   Set ncs = new Set();
@@ -200,14 +201,14 @@ class ProxyServer {
               }
               expect(header.parameters["response"], isNotNull);
 
-              var digest = md5.convert("${request.method}:${uri}".codeUnits);
+              var digest = md5.convert("${request.method}:$uri".codeUnits);
               var ha2 = hex.encode(digest.bytes);
 
               if (qop == null || qop == "" || qop == "none") {
-                digest = md5.convert("$ha1:${nonce}:$ha2".codeUnits);
+                digest = md5.convert("$ha1:$nonce:$ha2".codeUnits);
               } else {
-                digest = md5.convert(
-                    "$ha1:${nonce}:${nc}:${cnonce}:${qop}:$ha2".codeUnits);
+                digest =
+                    md5.convert("$ha1:$nonce:$nc:$cnonce:$qop:$ha2".codeUnits);
               }
               expect(hex.encode(digest.bytes),
                   equals(header.parameters["response"]));
