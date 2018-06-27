@@ -88,7 +88,7 @@ Future<Null> testBadServerDetachSocket() {
       var response = request.response;
       response.contentLength = 0;
       response.close();
-      expect(response.detachSocket, throwsA(new isInstanceOf<StateError>()));
+      expect(response.detachSocket, throwsA(new TypeMatcher<StateError>()));
       server.close();
       completer.complete();
     });
@@ -123,7 +123,7 @@ Future<Null> testClientDetachSocket() {
         lines.sort(); // Lines 1-3 becomes 3-5 in a fixed order.
         expect("accept-encoding: gzip", lines[3]);
         expect("content-length: 0", lines[4]);
-        expect("host: 127.0.0.1:${port}", lines[5]);
+        expect("host: 127.0.0.1:$port", lines[5]);
         socket.close();
       });
       server.close();

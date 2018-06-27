@@ -88,9 +88,6 @@ class HttpSessionImpl implements HttpSession {
   }
 
   Map<K, V> cast<K, V>() => _data.cast<K, V>();
-
-  Map<K, V> retype<K, V>() => _data.retype<K, V>();
-
   update(key, update(value), {ifAbsent()}) =>
       _data.update(key, update, ifAbsent: ifAbsent);
 

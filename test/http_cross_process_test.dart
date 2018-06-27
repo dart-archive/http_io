@@ -50,8 +50,7 @@ Future<Process> runClientProcess(int port) {
         .toFilePath();
   }
 
-  return Process
-      .run(
+  return Process.run(
           Platform.executable,
           []
             ..addAll(Platform.executableArguments)

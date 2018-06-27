@@ -137,7 +137,7 @@ Future<Null> testEarlyClose3() {
   final completer = new Completer<Null>();
   HttpServer.bind("127.0.0.1", 0).then((server) {
     server.listen((request) {
-      var subscription;
+      StreamSubscription subscription;
       subscription = request.listen((_) {}, onError: (error) {
         // subscription.cancel should not trigger an error.
         subscription.cancel();

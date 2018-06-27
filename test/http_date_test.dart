@@ -43,7 +43,7 @@ void testFormatParseHttpDate() {
 void testParseHttpDateFailures() {
   // The calls below can throw different exceptions based on the iteration of
   // the loop. This matcher catches all exceptions.
-  final throws = throwsA(new isInstanceOf<Object>());
+  final throws = throwsA(new TypeMatcher<Object>());
   expect(() {
     HttpDate.parse("");
   }, throws);

@@ -968,8 +968,9 @@ class _HttpClientRequest extends _HttpOutboundMessage<HttpClientResponse>
   }
 
   Future<HttpClientResponse> get done {
-    _response ??= Future.wait([_responseCompleter.future, super.done],
-        eagerError: true).then((list) => list[0]);
+    _response ??=
+        Future.wait([_responseCompleter.future, super.done], eagerError: true)
+            .then((list) => list[0]);
     return _response;
   }
 
@@ -1585,8 +1586,8 @@ class _HttpClientConnection {
     if (proxy.isAuthenticated) {
       // If the proxy configuration contains user information use that
       // for proxy basic authorization.
-      String auth = CryptoUtils
-          .bytesToBase64(utf8.encode("${proxy.username}:${proxy.password}"));
+      String auth = CryptoUtils.bytesToBase64(
+          utf8.encode("${proxy.username}:${proxy.password}"));
       request.headers.set(HttpHeaders.PROXY_AUTHORIZATION, "Basic $auth");
     } else if (!proxy.isDirect && _httpClient._proxyCredentials.isNotEmpty) {
       proxyCreds = _httpClient._findProxyCredentials(proxy);
@@ -1707,8 +1708,8 @@ class _HttpClientConnection {
     if (proxy.isAuthenticated) {
       // If the proxy configuration contains user information use that
       // for proxy basic authorization.
-      String auth = CryptoUtils
-          .bytesToBase64(utf8.encode("${proxy.username}:${proxy.password}"));
+      String auth = CryptoUtils.bytesToBase64(
+          utf8.encode("${proxy.username}:${proxy.password}"));
       request.headers.set(HttpHeaders.PROXY_AUTHORIZATION, "Basic $auth");
     }
     return request.close().then((response) {
@@ -2368,8 +2369,8 @@ class _HttpServer extends Stream<HttpRequest> implements HttpServer {
 
   static Future<HttpServer> bind(
       address, int port, int backlog, bool v6Only, bool shared) {
-    return ServerSocket
-        .bind(address, port, backlog: backlog, v6Only: v6Only, shared: shared)
+    return ServerSocket.bind(address, port,
+            backlog: backlog, v6Only: v6Only, shared: shared)
         .then<HttpServer>((socket) {
       return new _HttpServer._(socket, true);
     });
@@ -2383,8 +2384,7 @@ class _HttpServer extends Stream<HttpRequest> implements HttpServer {
       bool v6Only,
       bool requestClientCertificate,
       bool shared) {
-    return SecureServerSocket
-        .bind(address, port, context,
+    return SecureServerSocket.bind(address, port, context,
             backlog: backlog,
             v6Only: v6Only,
             requestClientCertificate: requestClientCertificate,

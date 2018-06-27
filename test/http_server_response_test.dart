@@ -30,7 +30,7 @@ void testServerRequest(void handler(server, request),
         .then((request) => request.close())
         .then((response) {
       int received = 0;
-      var subscription;
+      StreamSubscription subscription;
       subscription = response.listen((data) {
         if (closeClient == true) {
           subscription.cancel();
@@ -121,7 +121,7 @@ Future<List> testResponseAddStream() {
 
   final completer3 = new Completer<Null>();
   testServerRequest((server, request) {
-    var controller = new StreamController(sync: true);
+    var controller = new StreamController<List<int>>(sync: true);
     request.response.addStream(controller.stream).then((response) {
       response.close();
       response.done.then((_) {

@@ -8,7 +8,7 @@ import 'package:http_io/http_io.dart';
 import 'package:test/test.dart';
 
 Future<int> runServer(int port, int connections, bool clean) {
-  var completer = new Completer();
+  Completer<int> completer = new Completer<int>();
   HttpServer.bind("127.0.0.1", port).then((server) {
     int i = 0;
     server.listen((request) {
@@ -20,8 +20,7 @@ Future<int> runServer(int port, int connections, bool clean) {
       }
     });
 
-    Future
-        .wait(new List.generate(connections, (_) {
+    Future.wait(new List.generate(connections, (_) {
       var client = new HttpClient();
       return client
           .get("127.0.0.1", server.port, "/")
@@ -30,8 +29,7 @@ Future<int> runServer(int port, int connections, bool clean) {
           .catchError((e) {
         if (clean) throw e;
       });
-    }))
-        .then((_) {
+    })).then((_) {
       if (clean) {
         int port = server.port;
         server.close().then((_) => completer.complete(port));

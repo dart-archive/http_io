@@ -22,8 +22,8 @@ Future<Null> serverCloseResponseAfterError() {
     if (!new File(name).existsSync()) {
       name = Platform.script.resolve(CLIENT_SCRIPT).toString();
     }
-    Process.run(Platform.executable, [name, server.port.toString()]).then(
-        (result) {
+    Process.run(Platform.executable, [name, server.port.toString()])
+        .then((result) {
       if (result.exitCode != 0) throw "Bad exit code";
       server.close();
       completer.complete();

@@ -22,9 +22,7 @@ import "package:test/test.dart";
 const SECONDS = 4;
 
 List<String> packageOptions() {
-  if (Platform.packageRoot != null) {
-    return <String>['--package-root=${Platform.packageRoot}'];
-  } else if (Platform.packageConfig != null) {
+  if (Platform.packageConfig != null) {
     return <String>['--packages=${Platform.packageConfig}'];
   } else {
     return <String>[];
@@ -56,8 +54,8 @@ Future<Null> runServerProcess() {
     }
 
     var arguments = packageOptions()..add(script);
-    Process.run(Platform.executable, arguments, environment: {'URL': url}).then(
-        (res) {
+    Process.run(Platform.executable, arguments, environment: {'URL': url})
+        .then((res) {
       subscription.cancel();
       if (res.exitCode != 0) {
         throw "Child exited with ${res.exitCode} instead of 0. "

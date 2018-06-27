@@ -14,7 +14,7 @@ Future<Null> runTest(int totalConnections, [String body]) {
       HttpResponse response = request.response;
       // Cannot mutate request headers.
       expect(() => request.headers.add("X-Request-Header", "value"),
-          throwsA(new isInstanceOf<HttpException>()));
+          throwsA(new TypeMatcher<HttpException>()));
       expect("value", request.headers.value("X-Request-Header"));
       request.listen((_) {}, onDone: () {
         // Can still mutate response headers as long as no data has been sent.
@@ -26,7 +26,7 @@ Future<Null> runTest(int totalConnections, [String body]) {
           expect(() => response.reasonPhrase = "OK", throwsStateError);
           // Cannot mutate response headers when data has been sent.
           expect(() => response.headers.add("X-Request-Header", "value2"),
-              throwsA(new isInstanceOf<HttpException>()));
+              throwsA(new TypeMatcher<HttpException>()));
         }
         response..close();
         // Cannot change state or reason after connection is closed.
@@ -34,7 +34,7 @@ Future<Null> runTest(int totalConnections, [String body]) {
         expect(() => response.reasonPhrase = "OK", throwsStateError);
         // Cannot mutate response headers after connection is closed.
         expect(() => response.headers.add("X-Request-Header", "value3"),
-            throwsA(new isInstanceOf<HttpException>()));
+            throwsA(new TypeMatcher<HttpException>()));
       });
     });
 
@@ -53,17 +53,17 @@ Future<Null> runTest(int totalConnections, [String body]) {
           request.write(body);
           // Cannot mutate request headers when data has been sent.
           expect(() => request.headers.add("X-Request-Header", "value2"),
-              throwsA(new isInstanceOf<HttpException>()));
+              throwsA(new TypeMatcher<HttpException>()));
         }
         request.close();
         // Cannot mutate request headers when data has been sent.
         expect(() => request.headers.add("X-Request-Header", "value3"),
-            throwsA(new isInstanceOf<HttpException>()));
+            throwsA(new TypeMatcher<HttpException>()));
         return request.done;
       }).then((HttpClientResponse response) {
         // Cannot mutate response headers.
         expect(() => response.headers.add("X-Response-Header", "value"),
-            throwsA(new isInstanceOf<HttpException>()));
+            throwsA(new TypeMatcher<HttpException>()));
         expect("value", response.headers.value("X-Response-Header"));
         response.listen((_) {}, onDone: () {
           // Do not close the connections before we have read the

@@ -25,7 +25,7 @@ class HttpParserTest {
       String request, String expectedMethod, String expectedUri,
       {int expectedTransferLength: 0,
       int expectedBytesReceived: 0,
-      Map<String, String> expectedHeaders: null,
+      Map<String, String> expectedHeaders,
       bool chunked: false,
       bool upgrade: false,
       int unparsedLength: 0,
@@ -123,7 +123,7 @@ class HttpParserTest {
       String request, String expectedMethod, String expectedUri,
       {int expectedTransferLength: 0,
       int expectedBytesReceived: 0,
-      Map<String, String> expectedHeaders: null,
+      Map<String, String> expectedHeaders,
       bool chunked: false,
       bool upgrade: false,
       int unparsedLength: 0,
@@ -197,10 +197,10 @@ class HttpParserTest {
       String response, int expectedStatusCode, String expectedReasonPhrase,
       {int expectedTransferLength: 0,
       int expectedBytesReceived: 0,
-      Map<String, String> expectedHeaders: null,
+      Map<String, String> expectedHeaders,
       bool chunked: false,
       bool close: false,
-      String responseToMethod: null,
+      String responseToMethod,
       bool connectionClose: false,
       bool upgrade: false,
       int unparsedLength: 0,
@@ -237,8 +237,6 @@ class HttpParserTest {
           expect(dataEndClose, equals(connectionClose));
         }
       }
-
-      ;
 
       httpParser.listen((incoming) {
         port.close();
@@ -300,7 +298,6 @@ class HttpParserTest {
       HttpParser httpParser = new HttpParser.responseParser();
       StreamController<List<int>> controller = new StreamController(sync: true);
       bool errorCalled = false;
-      ;
 
       if (chunkSize == -1) chunkSize = requestData.length;
 
