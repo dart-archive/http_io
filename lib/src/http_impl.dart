@@ -1697,7 +1697,7 @@ class _HttpClientConnection {
     closed = true;
     _httpClient._connectionClosed(this);
     _streamFuture
-        // TODO(ajohnsen): Add timeout.
+        .timeout(_httpClient.idleTimeout)
         .then((_) => _socket.destroy());
   }
 
@@ -1768,6 +1768,7 @@ class _ConnectionTarget {
   final SecurityContext context;
   final Set<_HttpClientConnection> _idle = new HashSet();
   final Set<_HttpClientConnection> _active = new HashSet();
+  final Set<ConnectionTask> _socketTasks = new HashSet();
   final Queue _pending = new ListQueue();
   int _connecting = 0;
 
@@ -1815,12 +1816,24 @@ class _ConnectionTarget {
   }
 
   void close(bool force) {
-    for (var c in _idle.toList()) {
-      c.close();
+    // Always cancel pending socket connections.
+    for (var t in _socketTasks.toList()) {
+      // Make sure the socket is destroyed if the ConnectionTask is cancelled.
+      t.socket.then((s) {
+        s.destroy();
+      }, onError: (e) {});
+      t.cancel();
     }
     if (force) {
+      for (var c in _idle.toList()) {
+        c.destroy();
+      }
       for (var c in _active.toList()) {
         c.destroy();
+      }
+    } else {
+      for (var c in _idle.toList()) {
+        c.close();
       }
     }
   }
@@ -1847,34 +1860,48 @@ class _ConnectionTarget {
       return currentBadCertificateCallback(certificate, uriHost, uriPort);
     }
 
-    Future<Socket> socketFuture = (isSecure && proxy.isDirect
-        ? SecureSocket.connect(host, port,
+    Future<ConnectionTask> connectionTask = (isSecure && proxy.isDirect
+        ? SecureSocket.startConnect(host, port,
             context: context, onBadCertificate: callback)
-        : Socket.connect(host, port));
+        : Socket.startConnect(host, port));
     _connecting++;
-    return socketFuture.then((socket) {
-      _connecting--;
-      socket.setOption(SocketOption.tcpNoDelay, true);
-      var connection =
-          new _HttpClientConnection(key, socket, client, false, context);
-      if (isSecure && !proxy.isDirect) {
-        connection._dispose = true;
-        return connection
-            .createProxyTunnel(uriHost, uriPort, proxy, callback)
-            .then((tunnel) {
-          client
-              ._getConnectionTarget(uriHost, uriPort, true)
-              .addNewActive(tunnel);
-          return new _ConnectionInfo(tunnel, proxy);
+    return connectionTask.then((ConnectionTask task) {
+      _socketTasks.add(task);
+      Future socketFuture = task.socket;
+      if (client.connectionTimeout != null) {
+        socketFuture =
+            socketFuture.timeout(client.connectionTimeout, onTimeout: () {
+          _socketTasks.remove(task);
+          task.cancel();
         });
-      } else {
-        addNewActive(connection);
-        return new _ConnectionInfo(connection, proxy);
       }
-    }, onError: (error) {
-      _connecting--;
-      _checkPending();
-      throw error;
+      return socketFuture.then((socket) {
+        _connecting--;
+        socket.setOption(SocketOption.tcpNoDelay, true);
+        var connection =
+            new _HttpClientConnection(key, socket, client, false, context);
+        if (isSecure && !proxy.isDirect) {
+          connection._dispose = true;
+          return connection
+              .createProxyTunnel(uriHost, uriPort, proxy, callback)
+              .then((tunnel) {
+            client
+                ._getConnectionTarget(uriHost, uriPort, true)
+                .addNewActive(tunnel);
+            _socketTasks.remove(task);
+            return new _ConnectionInfo(tunnel, proxy);
+          });
+        } else {
+          addNewActive(connection);
+          _socketTasks.remove(task);
+          return new _ConnectionInfo(connection, proxy);
+        }
+      }, onError: (error) {
+        _connecting--;
+        _socketTasks.remove(task);
+        _checkPending();
+        throw error;
+      });
     });
   }
 }
@@ -1896,6 +1923,8 @@ class _HttpClient implements HttpClient {
   BadCertificateCallback _badCertificateCallback;
 
   Duration get idleTimeout => _idleTimeout;
+
+  Duration connectionTimeout;
 
   int maxConnectionsPerHost;
 

@@ -10,6 +10,7 @@ import 'dart:collection'
 import 'dart:convert';
 import 'dart:io'
     show
+        ConnectionTask,
         BytesBuilder,
         gzip,
         HandshakeException,
@@ -1262,6 +1263,16 @@ abstract class HttpClient {
   ///
   /// The default value is 15 seconds.
   Duration idleTimeout;
+
+  /// Gets and sets the connection timeout.
+  ///
+  /// When connecting to a new host exceeds this timeout, a [SocketException]
+  /// is thrown. The timeout applies only to connections initiated after the
+  /// timeout is set.
+  ///
+  /// When this is `null`, the OS default timeout is used. The default is
+  /// `null`.
+  Duration connectionTimeout;
 
   /**
    * Gets and sets the maximum number of live connections, to a single host.
