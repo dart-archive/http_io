@@ -3,6 +3,7 @@
 // BSD-style license that can be found in the LICENSE file.
 
 import "dart:async";
+import "dart:io" show SocketException;
 
 import "package:http_io/http_io.dart";
 import "package:test/test.dart";
@@ -170,7 +171,8 @@ Future<Null> test5(int totalConnections) {
             return request.close();
           })
           .then((response) {})
-          .catchError((e) {}, test: (e) => e is HttpException);
+          .catchError((e) {},
+              test: (e) => e is HttpException || e is SocketException);
     }
     bool clientClosed = false;
     new Timer.periodic(new Duration(milliseconds: 100), (timer) {
