@@ -17,6 +17,7 @@ import 'dart:io'
         InternetAddress,
         IOSink,
         Platform,
+        RawSocketOption,
         SecureServerSocket,
         SecureSocket,
         SecurityContext,
