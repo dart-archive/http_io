@@ -15,8 +15,6 @@ dart:
 dart_task:
   - test
 
-# 1.24 analyzer breaks on generic method syntax. Remove this exclusion when
-# there is a new stable version.
 matrix:
   include:
   - dart: dev
