@@ -3,7 +3,7 @@ author: "Dart Team <misc@dartlang.org>"
 homepage: https://github.com/dart-lang/http_io
 description: HTTP Client and Server APIs.
 environment:
-  sdk: ">=2.0.0-dev.17.0 <3.0.0"
+  sdk: ">=2.0.0 <3.0.0"
 dev_dependencies:
   convert: "^2.0.1"
   crypto: "^2.0.2+1"
