@@ -9,19 +9,16 @@ before_script:
     fi
 
 dart:
+  - 2.2.0
   - dev
 
 dart_task:
-  - test: --platform vm
-  - dartanalyzer
-  - dartfmt
+  - test
 
-# 1.24 analyzer breaks on generic method syntax. Remove this exclusion when
-# there is a new stable version.
 matrix:
-  exclude:
-  - dart: stable
-    dart_task: dartanalyzer
+  include:
+  - dart: dev
+    dart_task: dartfmt
 
 # Only building master means that we don't run two builds for each pull request.
 branches:
