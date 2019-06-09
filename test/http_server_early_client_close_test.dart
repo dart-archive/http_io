@@ -104,6 +104,7 @@ Future<Null> testEarlyClose2() {
       }
       new File(name)
           .openRead()
+          .cast<List<int>>()
           .pipe(request.response)
           .catchError((e) {/* ignore */});
     });

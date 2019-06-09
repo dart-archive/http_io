@@ -148,6 +148,7 @@ Future<List> testResponseAddStream() {
   testServerRequest((server, request) {
     new File("__nonexistent_file_")
         .openRead()
+        .cast<List<int>>()
         .pipe(request.response)
         .catchError((e) {
       server.close();
@@ -162,7 +163,9 @@ Future<Null> testResponseAddStreamClosed() {
   final completer = new Completer<Null>();
   File file = scriptSource;
   testServerRequest((server, request) {
-    request.response.addStream(file.openRead()).then((response) {
+    request.response
+        .addStream(file.openRead().cast<List<int>>())
+        .then((response) {
       response.close();
       response.done.then((_) => server.close());
     });
