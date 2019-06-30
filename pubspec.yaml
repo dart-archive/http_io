@@ -4,7 +4,7 @@ homepage: https://github.com/dart-lang/http_io
 description: HTTP Client and Server APIs.
 
 environment:
-  sdk: ">=2.2.0 <3.0.0"
+  sdk: ">=2.5.0-dev.0.0 <3.0.0"
 
 dev_dependencies:
   convert: ^2.0.1

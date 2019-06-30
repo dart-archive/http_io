@@ -31,7 +31,7 @@ class HttpParserTest {
       int unparsedLength: 0,
       bool connectionClose: false,
       String expectedVersion: "1.1"}) {
-    StreamController<List<int>> controller;
+    StreamController<Uint8List> controller;
     void reset() {
       HttpParser httpParser = new HttpParser.requestParser();
       controller = new StreamController(sync: true);
@@ -101,7 +101,7 @@ class HttpParserTest {
       upgraded = false;
     }
 
-    void testWrite(List<int> requestData, [int chunkSize = -1]) {
+    void testWrite(Uint8List requestData, [int chunkSize = -1]) {
       if (chunkSize == -1) chunkSize = requestData.length;
       reset();
       for (int pos = 0; pos < requestData.length; pos += chunkSize) {
@@ -113,7 +113,7 @@ class HttpParserTest {
 
     // Test parsing the request three times delivering the data in
     // different chunks.
-    List<int> requestData = new Uint8List.fromList(request.codeUnits);
+    Uint8List requestData = new Uint8List.fromList(request.codeUnits);
     testWrite(requestData);
     testWrite(requestData, 10);
     testWrite(requestData, 1);
@@ -153,7 +153,7 @@ class HttpParserTest {
   static void _testParseInvalidRequest(String request) {
     HttpParser httpParser;
     bool errorCalled;
-    StreamController<List<int>> controller;
+    StreamController<Uint8List> controller;
 
     void reset() {
       httpParser = new HttpParser.requestParser();
@@ -173,7 +173,7 @@ class HttpParserTest {
       errorCalled = false;
     }
 
-    void testWrite(List<int> requestData, [int chunkSize = -1]) {
+    void testWrite(Uint8List requestData, [int chunkSize = -1]) {
       if (chunkSize == -1) chunkSize = requestData.length;
       reset();
       for (int pos = 0;
@@ -187,7 +187,7 @@ class HttpParserTest {
 
     // Test parsing the request three times delivering the data in
     // different chunks.
-    List<int> requestData = new Uint8List.fromList(request.codeUnits);
+    Uint8List requestData = new Uint8List.fromList(request.codeUnits);
     testWrite(requestData);
     testWrite(requestData, 10);
     testWrite(requestData, 1);
@@ -205,7 +205,7 @@ class HttpParserTest {
       bool upgrade: false,
       int unparsedLength: 0,
       String expectedVersion: "1.1"}) {
-    StreamController<List<int>> controller;
+    StreamController<Uint8List> controller;
 
     void reset() {
       HttpParser httpParser;
@@ -275,7 +275,7 @@ class HttpParserTest {
       bytesReceived = 0;
     }
 
-    void testWrite(List<int> requestData, [int chunkSize = -1]) {
+    void testWrite(Uint8List requestData, [int chunkSize = -1]) {
       if (chunkSize == -1) chunkSize = requestData.length;
       reset();
       for (int pos = 0; pos < requestData.length; pos += chunkSize) {
@@ -287,16 +287,16 @@ class HttpParserTest {
 
     // Test parsing the request three times delivering the data in
     // different chunks.
-    List<int> responseData = new Uint8List.fromList(response.codeUnits);
+    Uint8List responseData = new Uint8List.fromList(response.codeUnits);
     testWrite(responseData);
     testWrite(responseData, 10);
     testWrite(responseData, 1);
   }
 
   static void _testParseInvalidResponse(String response, [bool close = false]) {
-    void testWrite(List<int> requestData, [int chunkSize = -1]) {
+    void testWrite(Uint8List requestData, [int chunkSize = -1]) {
       HttpParser httpParser = new HttpParser.responseParser();
-      StreamController<List<int>> controller = new StreamController(sync: true);
+      StreamController<Uint8List> controller = new StreamController(sync: true);
       bool errorCalled = false;
 
       if (chunkSize == -1) chunkSize = requestData.length;
@@ -330,7 +330,7 @@ class HttpParserTest {
 
     // Test parsing the request three times delivering the data in
     // different chunks.
-    List<int> responseData = new Uint8List.fromList(response.codeUnits);
+    Uint8List responseData = new Uint8List.fromList(response.codeUnits);
     testWrite(responseData);
     testWrite(responseData, 10);
     testWrite(responseData, 1);
