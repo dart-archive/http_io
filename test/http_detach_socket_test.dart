@@ -158,7 +158,7 @@ Future<Null> testUpgradedConnection() {
       request.response.headers.set('connection', 'upgrade');
       if (request.headers.value('upgrade') == 'mine') {
         request.response.detachSocket().then((socket) {
-          socket.pipe(socket).then((_) {});
+          socket.cast<List<int>>().pipe(socket).then((_) {});
         });
       } else {
         request.response.close();

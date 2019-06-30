@@ -308,7 +308,7 @@ class _HttpClientResponse extends _HttpInboundMessage
     Stream<List<int>> stream = _incoming;
     if (_httpClient.autoUncompress &&
         headers.value(HttpHeaders.CONTENT_ENCODING) == "gzip") {
-      stream = stream.transform(gzip.decoder);
+      stream = gzip.decoder.bind(stream);
     }
     return stream.listen(onData,
         onError: onError, onDone: onDone, cancelOnError: cancelOnError);
@@ -2696,13 +2696,13 @@ class _HttpConnectionInfo implements HttpConnectionInfo {
   }
 }
 
-class _DetachedSocket extends Stream<List<int>> implements Socket {
-  final Stream<List<int>> _incoming;
+class _DetachedSocket extends Stream<Uint8List> implements Socket {
+  final Stream<Uint8List> _incoming;
   final Socket _socket;
 
   _DetachedSocket(this._socket, this._incoming);
 
-  StreamSubscription<List<int>> listen(void onData(List<int> event),
+  StreamSubscription<Uint8List> listen(void onData(Uint8List event),
       {Function onError, void onDone(), bool cancelOnError}) {
     return _incoming.listen(onData,
         onError: onError, onDone: onDone, cancelOnError: cancelOnError);
@@ -2738,7 +2738,7 @@ class _DetachedSocket extends Stream<List<int>> implements Socket {
       _socket.addError(error, stackTrace);
 
   Future addStream(Stream<List<int>> stream) {
-    return _socket.addStream(stream);
+    return _socket.addStream(stream.cast<List<int>>());
   }
 
   void destroy() {
