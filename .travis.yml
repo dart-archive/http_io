@@ -9,7 +9,7 @@ before_script:
     fi
 
 dart:
-  - 2.2.0
+  - 2.5.0-dev.0.0
   - dev
 
 dart_task:
