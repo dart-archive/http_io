@@ -7,7 +7,7 @@ import "dart:async";
 import 'package:http_io/http_io.dart';
 import 'package:test/test.dart';
 
-Future<int> getData(HttpClient client, int port, bool chunked, int length) {
+Future<void> getData(HttpClient client, int port, bool chunked, int length) {
   return client
       .get("127.0.0.1", port, "/?chunked=$chunked&length=$length")
       .then((request) => request.close())
