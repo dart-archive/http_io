@@ -39,7 +39,7 @@ Future<HttpServer> makeServer() {
   });
 }
 
-Future<Process> runClientProcess(int port) {
+Future<void> runClientProcess(int port) {
   var script =
       "${Directory.current.path}/test/http_client_stays_alive_test.dart";
   if (!(new File(script)).existsSync()) {
