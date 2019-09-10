@@ -23,7 +23,7 @@ Future<HttpServer> startServer() {
     server.listen((request) {
       bool chunked = request.uri.queryParameters["chunked"] == "true";
       int length = int.parse(request.uri.queryParameters["length"]);
-      var buffer = new List<int>.filled(length, 0);
+      var buffer = List<int>.filled(length, 0);
       if (!chunked) request.response.contentLength = length;
       request.response.add(buffer);
       request.response.close();
@@ -33,9 +33,9 @@ Future<HttpServer> startServer() {
 }
 
 Future<Null> testKeepAliveNonChunked() {
-  final completer = new Completer<Null>();
+  final completer = Completer<Null>();
   startServer().then((server) {
-    var client = new HttpClient();
+    var client = HttpClient();
 
     getData(client, server.port, false, 100)
         .then((_) => getData(client, server.port, false, 100))
@@ -52,9 +52,9 @@ Future<Null> testKeepAliveNonChunked() {
 }
 
 Future<Null> testKeepAliveChunked() {
-  final completer = new Completer<Null>();
+  final completer = Completer<Null>();
   startServer().then((server) {
-    var client = new HttpClient();
+    var client = HttpClient();
 
     getData(client, server.port, true, 100)
         .then((_) => getData(client, server.port, true, 100))
@@ -71,9 +71,9 @@ Future<Null> testKeepAliveChunked() {
 }
 
 Future<Null> testKeepAliveMixed() {
-  final completer = new Completer<Null>();
+  final completer = Completer<Null>();
   startServer().then((server) {
-    var client = new HttpClient();
+    var client = HttpClient();
 
     getData(client, server.port, true, 100)
         .then((_) => getData(client, server.port, false, 100))

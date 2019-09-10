@@ -26,7 +26,7 @@ Future<String> connectGetSession(HttpClient client, int port,
     [String session]) {
   return client.get("127.0.0.1", port, "/").then((request) {
     if (session != null) {
-      request.cookies.add(new Cookie(SESSION_ID, session));
+      request.cookies.add(Cookie(SESSION_ID, session));
     }
     return request.close();
   }).then((response) {
@@ -35,10 +35,10 @@ Future<String> connectGetSession(HttpClient client, int port,
 }
 
 Future<Null> testSessions(int sessionCount) {
-  final completer = new Completer<Null>();
-  var client = new HttpClient();
+  final completer = Completer<Null>();
+  var client = HttpClient();
   HttpServer.bind("127.0.0.1", 0).then((server) {
-    var sessions = new Set();
+    var sessions = Set();
     server.listen((request) {
       sessions.add(request.session.id);
       request.response.close();
@@ -58,7 +58,7 @@ Future<Null> testSessions(int sessionCount) {
     }
     Future.wait(futures).then((clientSessions) {
       expect(sessions.length, equals(sessionCount));
-      expect(new Set.from(clientSessions), equals(sessions));
+      expect(Set.from(clientSessions), equals(sessions));
       server.close();
       client.close();
       completer.complete();
@@ -68,13 +68,13 @@ Future<Null> testSessions(int sessionCount) {
 }
 
 Future<Null> testTimeout(int sessionCount) {
-  final completer = new Completer<Null>();
-  var client = new HttpClient();
+  final completer = Completer<Null>();
+  var client = HttpClient();
   HttpServer.bind("127.0.0.1", 0).then((server) {
     server.sessionTimeout = 1;
     var timeouts = <Future>[];
     server.listen((request) {
-      var c = new Completer();
+      var c = Completer();
       timeouts.add(c.future);
       request.session.onTimeout = () {
         c.complete(null);
@@ -108,7 +108,7 @@ Future<Null> testTimeout(int sessionCount) {
 }
 
 Future<Null> testSessionsData() {
-  final completer = new Completer<Null>();
+  final completer = Completer<Null>();
   HttpServer.bind("127.0.0.1", 0).then((server) {
     bool firstHit = false;
     bool secondHit = false;
@@ -129,7 +129,7 @@ Future<Null> testSessionsData() {
       request.response.close();
     });
 
-    var client = new HttpClient();
+    var client = HttpClient();
     client
         .get("127.0.0.1", server.port, "/")
         .then((request) => request.close())
@@ -138,7 +138,7 @@ Future<Null> testSessionsData() {
         var id = getSessionId(response.cookies);
         expect(id, isNotNull);
         client.get("127.0.0.1", server.port, "/").then((request) {
-          request.cookies.add(new Cookie(SESSION_ID, id));
+          request.cookies.add(Cookie(SESSION_ID, id));
           return request.close();
         }).then((response) {
           response.listen((_) {}, onDone: () {
@@ -157,7 +157,7 @@ Future<Null> testSessionsData() {
 }
 
 Future<Null> testSessionsDestroy() {
-  final completer = new Completer<Null>();
+  final completer = Completer<Null>();
   HttpServer.bind("127.0.0.1", 0).then((server) {
     bool firstHit = false;
     server.listen((request) {
@@ -174,7 +174,7 @@ Future<Null> testSessionsDestroy() {
       request.response.close();
     });
 
-    var client = new HttpClient();
+    var client = HttpClient();
     client
         .get("127.0.0.1", server.port, "/")
         .then((request) => request.close())
@@ -183,7 +183,7 @@ Future<Null> testSessionsDestroy() {
         var id = getSessionId(response.cookies);
         expect(id, isNotNull);
         client.get("127.0.0.1", server.port, "/").then((request) {
-          request.cookies.add(new Cookie(SESSION_ID, id));
+          request.cookies.add(Cookie(SESSION_ID, id));
           return request.close();
         }).then((response) {
           response.listen((_) {}, onDone: () {

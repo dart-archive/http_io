@@ -8,7 +8,7 @@ import "package:http_io/http_io.dart";
 import "package:test/test.dart";
 
 Future<Null> testNoBody(int totalConnections, bool explicitContentLength) {
-  var completer = new Completer<Null>();
+  var completer = Completer<Null>();
   int count = 0;
   HttpServer.bind("127.0.0.1", 0, backlog: totalConnections).then((server) {
     server.listen((HttpRequest request) {
@@ -41,7 +41,7 @@ Future<Null> testNoBody(int totalConnections, bool explicitContentLength) {
       fail(msg);
     });
 
-    HttpClient client = new HttpClient();
+    HttpClient client = HttpClient();
     for (int i = 0; i < totalConnections; i++) {
       client.get("127.0.0.1", server.port, "/").then((request) {
         if (explicitContentLength) {
@@ -61,7 +61,7 @@ Future<Null> testNoBody(int totalConnections, bool explicitContentLength) {
 }
 
 Future<Null> testBody(int totalConnections, bool useHeader) {
-  var completer = new Completer<Null>();
+  var completer = Completer<Null>();
   HttpServer.bind("127.0.0.1", 0, backlog: totalConnections).then((server) {
     int serverCount = 0;
     server.listen((HttpRequest request) {
@@ -102,7 +102,7 @@ Future<Null> testBody(int totalConnections, bool useHeader) {
     });
 
     int clientCount = 0;
-    HttpClient client = new HttpClient();
+    HttpClient client = HttpClient();
     for (int i = 0; i < totalConnections; i++) {
       client.get("127.0.0.1", server.port, "/").then((request) {
         if (useHeader) {
@@ -139,7 +139,7 @@ Future<Null> testBody(int totalConnections, bool useHeader) {
 }
 
 Future<Null> testBodyChunked(int totalConnections, bool useHeader) {
-  var completer = new Completer<Null>();
+  var completer = Completer<Null>();
   HttpServer.bind("127.0.0.1", 0, backlog: totalConnections).then((server) {
     server.listen((HttpRequest request) {
       expect(request.headers.value('content-length'), isNull);
@@ -172,7 +172,7 @@ Future<Null> testBodyChunked(int totalConnections, bool useHeader) {
     });
 
     int count = 0;
-    HttpClient client = new HttpClient();
+    HttpClient client = HttpClient();
     for (int i = 0; i < totalConnections; i++) {
       client.get("127.0.0.1", server.port, "/").then((request) {
         if (useHeader) {
@@ -213,7 +213,7 @@ Future<Null> testBodyChunked(int totalConnections, bool useHeader) {
 }
 
 Future<Null> testSetContentLength() {
-  var completer = new Completer<Null>();
+  var completer = Completer<Null>();
   HttpServer.bind("127.0.0.1", 0).then((server) {
     server.listen((HttpRequest request) {
       var response = request.response;
@@ -226,7 +226,7 @@ Future<Null> testSetContentLength() {
       response.close();
     });
 
-    var client = new HttpClient();
+    var client = HttpClient();
     client
         .get("127.0.0.1", server.port, "/")
         .then((request) => request.close())

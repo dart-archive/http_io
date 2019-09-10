@@ -9,7 +9,7 @@ import 'package:http_io/http_io.dart';
 import 'package:test/test.dart';
 
 Future<Null> testServerDetachSocket() {
-  final completer = new Completer<Null>();
+  final completer = Completer<Null>();
   HttpServer.bind("127.0.0.1", 0).then((server) {
     server.defaultResponseHeaders.clear();
     server.serverHeader = null;
@@ -18,8 +18,8 @@ Future<Null> testServerDetachSocket() {
       response.contentLength = 0;
       response.detachSocket().then((socket) {
         expect(socket, isNotNull);
-        var body = new StringBuffer();
-        socket.listen((data) => body.write(new String.fromCharCodes(data)),
+        var body = StringBuffer();
+        socket.listen((data) => body.write(String.fromCharCodes(data)),
             onDone: () => expect("Some data", body.toString()));
         socket.write("Test!");
         socket.close();
@@ -32,8 +32,8 @@ Future<Null> testServerDetachSocket() {
       socket.write("GET / HTTP/1.1\r\n"
           "content-length: 0\r\n\r\n"
           "Some data");
-      var body = new StringBuffer();
-      socket.listen((data) => body.write(new String.fromCharCodes(data)),
+      var body = StringBuffer();
+      socket.listen((data) => body.write(String.fromCharCodes(data)),
           onDone: () {
         expect(
             "HTTP/1.1 200 OK\r\n"
@@ -49,15 +49,15 @@ Future<Null> testServerDetachSocket() {
 }
 
 Future<Null> testServerDetachSocketNoWriteHeaders() {
-  final completer = new Completer<Null>();
+  final completer = Completer<Null>();
   HttpServer.bind("127.0.0.1", 0).then((server) {
     server.listen((request) {
       var response = request.response;
       response.contentLength = 0;
       response.detachSocket(writeHeaders: false).then((socket) {
         expect(socket, isNotNull);
-        var body = new StringBuffer();
-        socket.listen((data) => body.write(new String.fromCharCodes(data)),
+        var body = StringBuffer();
+        socket.listen((data) => body.write(String.fromCharCodes(data)),
             onDone: () => expect("Some data", body.toString()));
         socket.write("Test!");
         socket.close();
@@ -70,8 +70,8 @@ Future<Null> testServerDetachSocketNoWriteHeaders() {
       socket.write("GET / HTTP/1.1\r\n"
           "content-length: 0\r\n\r\n"
           "Some data");
-      var body = new StringBuffer();
-      socket.listen((data) => body.write(new String.fromCharCodes(data)),
+      var body = StringBuffer();
+      socket.listen((data) => body.write(String.fromCharCodes(data)),
           onDone: () {
         expect("Test!", body.toString());
         socket.close();
@@ -82,13 +82,13 @@ Future<Null> testServerDetachSocketNoWriteHeaders() {
 }
 
 Future<Null> testBadServerDetachSocket() {
-  final completer = new Completer<Null>();
+  final completer = Completer<Null>();
   HttpServer.bind("127.0.0.1", 0).then((server) {
     server.listen((request) {
       var response = request.response;
       response.contentLength = 0;
       response.close();
-      expect(response.detachSocket, throwsA(new TypeMatcher<StateError>()));
+      expect(response.detachSocket, throwsA(TypeMatcher<StateError>()));
       server.close();
       completer.complete();
     });
@@ -105,15 +105,15 @@ Future<Null> testBadServerDetachSocket() {
 }
 
 Future<Null> testClientDetachSocket() {
-  final completer = new Completer<Null>();
+  final completer = Completer<Null>();
   ServerSocket.bind("127.0.0.1", 0).then((server) {
     server.listen((socket) {
       int port = server.port;
       socket.write("HTTP/1.1 200 OK\r\n"
           "\r\n"
           "Test!");
-      var body = new StringBuffer();
-      socket.listen((data) => body.write(new String.fromCharCodes(data)),
+      var body = StringBuffer();
+      socket.listen((data) => body.write(String.fromCharCodes(data)),
           onDone: () {
         List<String> lines = body.toString().split("\r\n");
         expect(6, lines.length);
@@ -130,15 +130,15 @@ Future<Null> testClientDetachSocket() {
       completer.complete();
     });
 
-    var client = new HttpClient();
+    var client = HttpClient();
     client.userAgent = null;
     client
         .get("127.0.0.1", server.port, "/")
         .then((request) => request.close())
         .then((response) {
       response.detachSocket().then((socket) {
-        var body = new StringBuffer();
-        socket.listen((data) => body.write(new String.fromCharCodes(data)),
+        var body = StringBuffer();
+        socket.listen((data) => body.write(String.fromCharCodes(data)),
             onDone: () {
           expect("Test!", body.toString());
           client.close();
@@ -152,7 +152,7 @@ Future<Null> testClientDetachSocket() {
 }
 
 Future<Null> testUpgradedConnection() {
-  final completer = new Completer<Null>();
+  final completer = Completer<Null>();
   HttpServer.bind("127.0.0.1", 0).then((server) {
     server.listen((request) {
       request.response.headers.set('connection', 'upgrade');
@@ -165,7 +165,7 @@ Future<Null> testUpgradedConnection() {
       }
     });
 
-    var client = new HttpClient();
+    var client = HttpClient();
     client.userAgent = null;
     client.get("127.0.0.1", server.port, "/").then((request) {
       request.headers.set('upgrade', 'mine');

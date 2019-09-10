@@ -23,20 +23,20 @@ class HttpParserTest {
 
   static void _testParseRequest(
       String request, String expectedMethod, String expectedUri,
-      {int expectedTransferLength: 0,
-      int expectedBytesReceived: 0,
+      {int expectedTransferLength = 0,
+      int expectedBytesReceived = 0,
       Map<String, String> expectedHeaders,
-      bool chunked: false,
-      bool upgrade: false,
-      int unparsedLength: 0,
-      bool connectionClose: false,
-      String expectedVersion: "1.1"}) {
+      bool chunked = false,
+      bool upgrade = false,
+      int unparsedLength = 0,
+      bool connectionClose = false,
+      String expectedVersion = "1.1"}) {
     StreamController<Uint8List> controller;
     void reset() {
-      HttpParser httpParser = new HttpParser.requestParser();
-      controller = new StreamController(sync: true);
-      var port1 = new ReceivePort();
-      var port2 = new ReceivePort();
+      HttpParser httpParser = HttpParser.requestParser();
+      controller = StreamController(sync: true);
+      var port1 = ReceivePort();
+      var port2 = ReceivePort();
 
       String method;
       Uri uri;
@@ -113,7 +113,7 @@ class HttpParserTest {
 
     // Test parsing the request three times delivering the data in
     // different chunks.
-    Uint8List requestData = new Uint8List.fromList(request.codeUnits);
+    Uint8List requestData = Uint8List.fromList(request.codeUnits);
     testWrite(requestData);
     testWrite(requestData, 10);
     testWrite(requestData, 1);
@@ -121,14 +121,14 @@ class HttpParserTest {
 
   static void _testParseRequestLean(
       String request, String expectedMethod, String expectedUri,
-      {int expectedTransferLength: 0,
-      int expectedBytesReceived: 0,
+      {int expectedTransferLength = 0,
+      int expectedBytesReceived = 0,
       Map<String, String> expectedHeaders,
-      bool chunked: false,
-      bool upgrade: false,
-      int unparsedLength: 0,
-      bool connectionClose: false,
-      String expectedVersion: "1.1"}) {
+      bool chunked = false,
+      bool upgrade = false,
+      int unparsedLength = 0,
+      bool connectionClose = false,
+      String expectedVersion = "1.1"}) {
     _testParseRequest(request, expectedMethod, expectedUri,
         expectedTransferLength: expectedTransferLength,
         expectedBytesReceived: expectedBytesReceived,
@@ -156,9 +156,9 @@ class HttpParserTest {
     StreamController<Uint8List> controller;
 
     void reset() {
-      httpParser = new HttpParser.requestParser();
-      controller = new StreamController(sync: true);
-      var port = new ReceivePort();
+      httpParser = HttpParser.requestParser();
+      controller = StreamController(sync: true);
+      var port = ReceivePort();
       httpParser.listenToStream(controller.stream);
       var subscription = httpParser.listen((incoming) {
         fail("Expected request");
@@ -187,7 +187,7 @@ class HttpParserTest {
 
     // Test parsing the request three times delivering the data in
     // different chunks.
-    Uint8List requestData = new Uint8List.fromList(request.codeUnits);
+    Uint8List requestData = Uint8List.fromList(request.codeUnits);
     testWrite(requestData);
     testWrite(requestData, 10);
     testWrite(requestData, 1);
@@ -195,16 +195,16 @@ class HttpParserTest {
 
   static void _testParseResponse(
       String response, int expectedStatusCode, String expectedReasonPhrase,
-      {int expectedTransferLength: 0,
-      int expectedBytesReceived: 0,
+      {int expectedTransferLength = 0,
+      int expectedBytesReceived = 0,
       Map<String, String> expectedHeaders,
-      bool chunked: false,
-      bool close: false,
+      bool chunked = false,
+      bool close = false,
       String responseToMethod,
-      bool connectionClose: false,
-      bool upgrade: false,
-      int unparsedLength: 0,
-      String expectedVersion: "1.1"}) {
+      bool connectionClose = false,
+      bool upgrade = false,
+      int unparsedLength = 0,
+      String expectedVersion = "1.1"}) {
     StreamController<Uint8List> controller;
 
     void reset() {
@@ -216,9 +216,9 @@ class HttpParserTest {
       String reasonPhrase;
       HttpHeaders headers;
       int bytesReceived;
-      httpParser = new HttpParser.responseParser();
-      controller = new StreamController(sync: true);
-      var port = new ReceivePort();
+      httpParser = HttpParser.responseParser();
+      controller = StreamController(sync: true);
+      var port = ReceivePort();
       httpParser.listenToStream(controller.stream);
       int doneCallCount = 0;
       // Called when done parsing entire message and done parsing body.
@@ -287,7 +287,7 @@ class HttpParserTest {
 
     // Test parsing the request three times delivering the data in
     // different chunks.
-    Uint8List responseData = new Uint8List.fromList(response.codeUnits);
+    Uint8List responseData = Uint8List.fromList(response.codeUnits);
     testWrite(responseData);
     testWrite(responseData, 10);
     testWrite(responseData, 1);
@@ -295,13 +295,13 @@ class HttpParserTest {
 
   static void _testParseInvalidResponse(String response, [bool close = false]) {
     void testWrite(Uint8List requestData, [int chunkSize = -1]) {
-      HttpParser httpParser = new HttpParser.responseParser();
-      StreamController<Uint8List> controller = new StreamController(sync: true);
+      HttpParser httpParser = HttpParser.responseParser();
+      StreamController<Uint8List> controller = StreamController(sync: true);
       bool errorCalled = false;
 
       if (chunkSize == -1) chunkSize = requestData.length;
 
-      var port = new ReceivePort();
+      var port = ReceivePort();
       httpParser.listenToStream(controller.stream);
       var subscription = httpParser.listen((incoming) {
         incoming.listen((data) {}, onError: (e) {
@@ -330,7 +330,7 @@ class HttpParserTest {
 
     // Test parsing the request three times delivering the data in
     // different chunks.
-    Uint8List responseData = new Uint8List.fromList(response.codeUnits);
+    Uint8List responseData = Uint8List.fromList(response.codeUnits);
     testWrite(responseData);
     testWrite(responseData, 10);
     testWrite(responseData, 1);
@@ -382,7 +382,7 @@ Header-A: AAA\r
 X-Header-B: bbb\r
 \r
 """;
-    headers = new Map();
+    headers = Map();
     headers["header-a"] = "AAA";
     headers["x-header-b"] = "bbb";
     _testParseRequestLean(request, "POST", "/test", expectedHeaders: headers);
@@ -394,7 +394,7 @@ Empty-Header-2:\r
         \r
 \r
 """;
-    headers = new Map();
+    headers = Map();
     headers["empty-header-1"] = "";
     headers["empty-header-2"] = "";
     _testParseRequestLean(request, "POST", "/test", expectedHeaders: headers);
@@ -405,7 +405,7 @@ Header-A:   AAA\r
 X-Header-B:\t \t bbb\r
 \r
 """;
-    headers = new Map();
+    headers = Map();
     headers["header-a"] = "AAA";
     headers["x-header-b"] = "bbb";
     _testParseRequestLean(request, "POST", "/test", expectedHeaders: headers);
@@ -420,7 +420,7 @@ X-Header-B:           b\r
 \r
 """;
 
-    headers = new Map();
+    headers = Map();
     headers["header-a"] = "AAA";
     headers["x-header-b"] = "bbb";
     _testParseRequestLean(request, "POST", "/test", expectedHeaders: headers);
@@ -512,7 +512,7 @@ GET /irc HTTP/1.1\r
 Upgrade: irc/1.2\r
 Connection: Upgrade\r
 \r\n\x01\x01\x01\x01\x01\x02\x02\x02\x02\xFF""";
-    headers = new Map();
+    headers = Map();
     headers["upgrade"] = "irc/1.2";
     _testParseRequest(request, "GET", "/irc",
         expectedHeaders: headers, upgrade: true, unparsedLength: 10);
@@ -523,7 +523,7 @@ GET /irc HTTP/1.1\r
 Upgrade: irc/1.2\r
 Connection: Upgrade\r
 \r\n""";
-    headers = new Map();
+    headers = Map();
     headers["upgrade"] = "irc/1.2";
     _testParseRequest(request, "GET", "/irc",
         expectedHeaders: headers, upgrade: true);
@@ -538,7 +538,7 @@ Sec-WebSocket-Key: dGhlIHNhbXBsZSBub25jZQ==\r
 Origin: http://example.com\r
 Sec-WebSocket-Version: 13\r
 \r\n""";
-    headers = new Map();
+    headers = Map();
     headers["host"] = "server.example.com";
     headers["upgrade"] = "websocket";
     headers["sec-websocket-key"] = "dGhlIHNhbXBsZSBub25jZQ==";
@@ -561,7 +561,7 @@ Sec-WebSocket-Key: dGhlIHNhbXBsZSBub25jZQ==\r
 Origin: http://example.com\r
 Sec-WebSocket-Version: 13\r
 \r\n0123456""";
-    headers = new Map();
+    headers = Map();
     headers["host"] = "server.example.com";
     headers["upgrade"] = "websocket";
     headers["sec-websocket-key"] = "dGhlIHNhbXBsZSBub25jZQ==";
@@ -619,7 +619,7 @@ HTTP/1.1 200 OK\r
 Content-Length: 20\r
 Content-Type: text/html\r
 \r\n""";
-    headers = new Map();
+    headers = Map();
     headers["content-length"] = "20";
     headers["content-type"] = "text/html";
     _testParseResponse(response, 200, "OK",
@@ -678,7 +678,7 @@ HTTP/1.1 101 Switching Protocols\r
 Upgrade: irc/1.2\r
 Connection: Upgrade\r
 \r\n""";
-    headers = new Map();
+    headers = Map();
     headers["upgrade"] = "irc/1.2";
     _testParseResponse(response, 101, "Switching Protocols",
         expectedHeaders: headers, upgrade: true);
@@ -689,7 +689,7 @@ HTTP/1.1 101 Switching Protocols\r
 Upgrade: irc/1.2\r
 Connection: Upgrade\r
 \r\n\x00\x10\x20\x30\x40\x50\x60\x70\x80\x90\xA0\xB0\xC0\xD0\xE0\xF0""";
-    headers = new Map();
+    headers = Map();
     headers["upgrade"] = "irc/1.2";
     _testParseResponse(response, 101, "Switching Protocols",
         expectedHeaders: headers, upgrade: true, unparsedLength: 16);
@@ -701,7 +701,7 @@ Upgrade: websocket\r
 Connection: Upgrade\r
 Sec-WebSocket-Accept: s3pPLMBiTxaQ9kYGzzhZRbK+xOo=\r
 \r\n""";
-    headers = new Map();
+    headers = Map();
     headers["upgrade"] = "websocket";
     headers["sec-websocket-accept"] = "s3pPLMBiTxaQ9kYGzzhZRbK+xOo=";
     _testParseResponse(response, 101, "Switching Protocols",
@@ -714,7 +714,7 @@ Upgrade: websocket\r
 Connection: Upgrade\r
 Sec-WebSocket-Accept: s3pPLMBiTxaQ9kYGzzhZRbK+xOo=\r
 \r\nABCD""";
-    headers = new Map();
+    headers = Map();
     headers["upgrade"] = "websocket";
     headers["sec-websocket-accept"] = "s3pPLMBiTxaQ9kYGzzhZRbK+xOo=";
     _testParseResponse(response, 101, "Switching Protocols",

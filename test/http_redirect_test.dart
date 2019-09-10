@@ -9,7 +9,7 @@ import 'package:test/test.dart';
 
 Future<HttpServer> setupServer() {
   return HttpServer.bind("127.0.0.1", 0).then((server) {
-    var handlers = new Map<String, Function>();
+    var handlers = Map<String, Function>();
     addRequestHandler(
         String path, void handler(HttpRequest request, HttpResponse response)) {
       handlers[path] = handler;
@@ -191,9 +191,9 @@ void checkRedirects(int redirectCount, HttpClientResponse response) {
 }
 
 Future<Null> testManualRedirect() {
-  final completer = new Completer<Null>();
+  final completer = Completer<Null>();
   setupServer().then((server) {
-    HttpClient client = new HttpClient();
+    HttpClient client = HttpClient();
 
     int redirectCount = 0;
     handleResponse(HttpClientResponse response) {
@@ -223,9 +223,9 @@ Future<Null> testManualRedirect() {
 }
 
 Future<Null> testManualRedirectWithHeaders() {
-  final completer = new Completer<Null>();
+  final completer = Completer<Null>();
   setupServer().then((server) {
-    HttpClient client = new HttpClient();
+    HttpClient client = HttpClient();
 
     int redirectCount = 0;
 
@@ -256,10 +256,10 @@ Future<Null> testManualRedirectWithHeaders() {
 }
 
 Future<Null> testAutoRedirect() {
-  final completer = new Completer<Null>();
+  final completer = Completer<Null>();
 
   setupServer().then((server) {
-    HttpClient client = new HttpClient();
+    HttpClient client = HttpClient();
 
     client
         .getUrl(Uri.parse("http://127.0.0.1:${server.port}/redirect"))
@@ -278,9 +278,9 @@ Future<Null> testAutoRedirect() {
 }
 
 Future<Null> testAutoRedirectWithHeaders() {
-  final completer = new Completer<Null>();
+  final completer = Completer<Null>();
   setupServer().then((server) {
-    HttpClient client = new HttpClient();
+    HttpClient client = HttpClient();
 
     client
         .getUrl(Uri.parse("http://127.0.0.1:${server.port}/src"))
@@ -300,9 +300,9 @@ Future<Null> testAutoRedirectWithHeaders() {
 }
 
 Future<Null> testAutoRedirect301POST() {
-  final completer = new Completer<Null>();
+  final completer = Completer<Null>();
   setupServer().then((server) {
-    HttpClient client = new HttpClient();
+    HttpClient client = HttpClient();
 
     client
         .postUrl(Uri.parse("http://127.0.0.1:${server.port}/301src"))
@@ -322,9 +322,9 @@ Future<Null> testAutoRedirect301POST() {
 }
 
 Future<Null> testAutoRedirect303POST() {
-  final completer = new Completer<Null>();
+  final completer = Completer<Null>();
   setupServer().then((server) {
-    HttpClient client = new HttpClient();
+    HttpClient client = HttpClient();
 
     client
         .postUrl(Uri.parse("http://127.0.0.1:${server.port}/303src"))
@@ -344,9 +344,9 @@ Future<Null> testAutoRedirect303POST() {
 }
 
 Future<Null> testAutoRedirectLimit() {
-  final completer = new Completer<Null>();
+  final completer = Completer<Null>();
   setupServer().then((server) {
-    HttpClient client = new HttpClient();
+    HttpClient client = HttpClient();
     client
         .getUrl(Uri.parse("http://127.0.0.1:${server.port}/1"))
         .then((HttpClientRequest request) => request.close())
@@ -361,9 +361,9 @@ Future<Null> testAutoRedirectLimit() {
 }
 
 Future<Null> testRedirectLoop() {
-  final completer = new Completer<Null>();
+  final completer = Completer<Null>();
   setupServer().then((server) {
-    HttpClient client = new HttpClient();
+    HttpClient client = HttpClient();
     client
         .getUrl(Uri.parse("http://127.0.0.1:${server.port}/A"))
         .then((HttpClientRequest request) => request.close())
@@ -378,9 +378,9 @@ Future<Null> testRedirectLoop() {
 }
 
 Future<Null> testRedirectClosingConnection() {
-  final completer = new Completer<Null>();
+  final completer = Completer<Null>();
   setupServer().then((server) {
-    HttpClient client = new HttpClient();
+    HttpClient client = HttpClient();
     client
         .getUrl(Uri.parse("http://127.0.0.1:${server.port}/closing"))
         .then((request) => request.close())
@@ -398,9 +398,9 @@ Future<Null> testRedirectClosingConnection() {
 
 Future<Null> testRedirectRelativeUrl() async {
   Future<Null> testPath(String path) {
-    final completer = new Completer<Null>();
+    final completer = Completer<Null>();
     setupServer().then((server) {
-      HttpClient client = new HttpClient();
+      HttpClient client = HttpClient();
       client
           .getUrl(Uri.parse("http://127.0.0.1:${server.port}$path"))
           .then((request) => request.close())
@@ -426,9 +426,9 @@ Future<Null> testRedirectRelativeUrl() async {
 }
 
 Future<Null> testRedirectRelativeToAbsolute() {
-  final completer = new Completer<Null>();
+  final completer = Completer<Null>();
   setupServer().then((server) {
-    HttpClient client = new HttpClient();
+    HttpClient client = HttpClient();
 
     handleResponse(HttpClientResponse response) {
       response.listen((_) => fail("Response data not expected"), onDone: () {

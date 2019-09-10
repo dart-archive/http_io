@@ -10,8 +10,8 @@ import 'package:test/test.dart';
 
 // Test that a response line without any reason phrase is handled.
 Future<Null> missingReasonPhrase(int statusCode, bool includeSpace) {
-  final completer = new Completer<Null>();
-  var client = new HttpClient();
+  final completer = Completer<Null>();
+  var client = HttpClient();
   ServerSocket.bind("127.0.0.1", 0).then((server) {
     server.listen((client) {
       client.listen(null);

@@ -5,18 +5,18 @@
 // Global constants.
 class Const {
   // Bytes for "HTTP".
-  static const HTTP = const [72, 84, 84, 80];
+  static const HTTP = [72, 84, 84, 80];
   // Bytes for "HTTP/1.".
-  static const HTTP1DOT = const [72, 84, 84, 80, 47, 49, 46];
+  static const HTTP1DOT = [72, 84, 84, 80, 47, 49, 46];
   // Bytes for "HTTP/1.0".
-  static const HTTP10 = const [72, 84, 84, 80, 47, 49, 46, 48];
+  static const HTTP10 = [72, 84, 84, 80, 47, 49, 46, 48];
   // Bytes for "HTTP/1.1".
-  static const HTTP11 = const [72, 84, 84, 80, 47, 49, 46, 49];
+  static const HTTP11 = [72, 84, 84, 80, 47, 49, 46, 49];
 
   static const bool T = true;
   static const bool F = false;
   // Lookup-map for the following characters: '()<>@,;:\\"/[]?={} \t'.
-  static const SEPARATOR_MAP = const [
+  static const SEPARATOR_MAP = [
     F, F, F, F, F, F, F, F, F, T, F, F, F, F, F, F, F, F, F, F, F, F, F, F, //
     F, F, F, F, F, F, F, F, T, F, T, F, F, F, F, F, T, T, F, F, T, F, F, T, //
     F, F, F, F, F, F, F, F, F, F, T, T, T, T, T, T, T, F, F, F, F, F, F, F, //

@@ -24,7 +24,7 @@ const CERTIFICATE = "localhost_cert";
 
 String localFile(path) {
   var script = "${Directory.current.path}/test/$path";
-  if (!(new File(script)).existsSync()) {
+  if (!(File(script)).existsSync()) {
     // If we can't find the file relative to the cwd, then look relative to
     // Platform.script.
     script = Platform.script.resolve(path).toFilePath();
@@ -32,12 +32,12 @@ String localFile(path) {
   return script;
 }
 
-SecurityContext untrustedServerContext = new SecurityContext()
+SecurityContext untrustedServerContext = SecurityContext()
   ..useCertificateChain(localFile('certificates/untrusted_server_chain.pem'))
   ..usePrivateKey(localFile('certificates/untrusted_server_key.pem'),
       password: 'dartdart');
 
-SecurityContext clientContext = new SecurityContext()
+SecurityContext clientContext = SecurityContext()
   ..setTrustedCertificates(localFile('certificates/trusted_certs.pem'));
 
 Future<HttpServer> runServer() {
@@ -55,7 +55,7 @@ Future<HttpServer> runServer() {
 }
 
 Future<Null> runTest() {
-  final completer = new Completer<Null>();
+  final completer = Completer<Null>();
   var clientScript = localFile('https_unauthorized_client.dart');
   Future clientProcess(int port) {
     return Process.run(Platform.executable, [clientScript, port.toString()])

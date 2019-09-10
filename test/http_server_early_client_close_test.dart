@@ -26,12 +26,12 @@ class EarlyCloseTest {
 
   Future execute() {
     return HttpServer.bind("127.0.0.1", 0).then((server) {
-      Completer c = new Completer();
+      Completer c = Completer();
 
       bool calledOnRequest = false;
       bool calledOnError = false;
-      ReceivePort port = new ReceivePort();
-      var requestCompleter = new Completer();
+      ReceivePort port = ReceivePort();
+      var requestCompleter = Completer();
       server.listen((request) {
         expect(expectRequest, isTrue);
         expect(calledOnError, isFalse);
@@ -70,9 +70,9 @@ class EarlyCloseTest {
 }
 
 Future<Null> testEarlyClose1() async {
-  List<EarlyCloseTest> tests = new List<EarlyCloseTest>();
+  List<EarlyCloseTest> tests = List<EarlyCloseTest>();
   void add(Object data, [String exception, bool expectRequest = false]) {
-    tests.add(new EarlyCloseTest(data, exception, expectRequest));
+    tests.add(EarlyCloseTest(data, exception, expectRequest));
   }
   // The empty packet is valid.
 
@@ -94,15 +94,15 @@ Future<Null> testEarlyClose1() async {
 }
 
 Future<Null> testEarlyClose2() {
-  final completer = new Completer<Null>();
+  final completer = Completer<Null>();
   HttpServer.bind("127.0.0.1", 0).then((server) {
     server.listen((request) {
       String name =
           "${Directory.current.path}/test/http_server_early_client_close_test.dart";
-      if (!new File(name).existsSync()) {
+      if (!File(name).existsSync()) {
         name = Platform.script.toFilePath();
       }
-      new File(name)
+      File(name)
           .openRead()
           .cast<List<int>>()
           .pipe(request.response)
@@ -135,7 +135,7 @@ Future<Null> testEarlyClose2() {
 }
 
 Future<Null> testEarlyClose3() {
-  final completer = new Completer<Null>();
+  final completer = Completer<Null>();
   HttpServer.bind("127.0.0.1", 0).then((server) {
     server.listen((request) {
       StreamSubscription subscription;

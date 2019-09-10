@@ -21,7 +21,7 @@ void testServerRequest(void handler(server, request),
       handler(server, request);
     });
 
-    var client = new HttpClient();
+    var client = HttpClient();
     // We only close the client on either
     // - Bad response headers
     // - Response done (with optional errors in between).
@@ -51,8 +51,8 @@ void testServerRequest(void handler(server, request),
 }
 
 Future<List> testResponseDone() {
-  final completers = new List<Future<Null>>();
-  final completer = new Completer<Null>();
+  final completers = List<Future<Null>>();
+  final completer = Completer<Null>();
   testServerRequest((server, request) {
     request.response.close();
     request.response.done.then((response) {
@@ -63,9 +63,9 @@ Future<List> testResponseDone() {
   });
   completers.add(completer.future);
 
-  final completer2 = new Completer<Null>();
+  final completer2 = Completer<Null>();
   testServerRequest((server, request) {
-    new File("__nonexistent_file_")
+    File("__nonexistent_file_")
         .openRead()
         .cast<List<int>>()
         .pipe(request.response)
@@ -76,7 +76,7 @@ Future<List> testResponseDone() {
   });
   completers.add(completer2.future);
 
-  final completer3 = new Completer<Null>();
+  final completer3 = Completer<Null>();
   testServerRequest((server, request) {
     request.response.done.then((_) {
       server.close();
@@ -93,8 +93,8 @@ Future<List> testResponseDone() {
 Future<List> testResponseAddStream() {
   File file = scriptSource;
   int bytes = file.lengthSync();
-  final completers = new List<Future<Null>>();
-  final completer = new Completer<Null>();
+  final completers = List<Future<Null>>();
+  final completer = Completer<Null>();
   testServerRequest((server, request) {
     request.response.addStream(file.openRead()).then((response) {
       response.close();
@@ -106,7 +106,7 @@ Future<List> testResponseAddStream() {
   }, bytes: bytes);
   completers.add(completer.future);
 
-  final completer2 = new Completer<Null>();
+  final completer2 = Completer<Null>();
   testServerRequest((server, request) {
     request.response.addStream(file.openRead()).then((response) {
       request.response.addStream(file.openRead()).then((response) {
@@ -120,9 +120,9 @@ Future<List> testResponseAddStream() {
   }, bytes: bytes * 2);
   completers.add(completer2.future);
 
-  final completer3 = new Completer<Null>();
+  final completer3 = Completer<Null>();
   testServerRequest((server, request) {
-    var controller = new StreamController<List<int>>(sync: true);
+    var controller = StreamController<List<int>>(sync: true);
     request.response.addStream(controller.stream).then((response) {
       response.close();
       response.done.then((_) {
@@ -134,10 +134,10 @@ Future<List> testResponseAddStream() {
   }, bytes: 0);
   completers.add(completer3.future);
 
-  final completer4 = new Completer<Null>();
+  final completer4 = Completer<Null>();
   testServerRequest((server, request) {
     request.response
-        .addStream(new File("__nonexistent_file_").openRead())
+        .addStream(File("__nonexistent_file_").openRead())
         .catchError((e) {
       server.close();
       completer4.complete();
@@ -145,9 +145,9 @@ Future<List> testResponseAddStream() {
   });
   completers.add(completer4.future);
 
-  final completer5 = new Completer<Null>();
+  final completer5 = Completer<Null>();
   testServerRequest((server, request) {
-    new File("__nonexistent_file_")
+    File("__nonexistent_file_")
         .openRead()
         .cast<List<int>>()
         .pipe(request.response)
@@ -161,7 +161,7 @@ Future<List> testResponseAddStream() {
 }
 
 Future<Null> testResponseAddStreamClosed() {
-  final completer = new Completer<Null>();
+  final completer = Completer<Null>();
   File file = scriptSource;
   testServerRequest((server, request) {
     request.response
@@ -197,9 +197,9 @@ Future<Null> testResponseAddStreamClosed() {
 
 Future<List> testResponseAddClosed() {
   File file = scriptSource;
-  final completers = new List<Future<Null>>();
+  final completers = List<Future<Null>>();
 
-  final completer = new Completer<Null>();
+  final completer = Completer<Null>();
   testServerRequest((server, request) {
     request.response.add(file.readAsBytesSync());
     request.response.close();
@@ -210,7 +210,7 @@ Future<List> testResponseAddClosed() {
   }, closeClient: true);
   completers.add(completer.future);
 
-  final completer2 = new Completer<Null>();
+  final completer2 = Completer<Null>();
   testServerRequest((server, request) {
     for (int i = 0; i < 1000; i++) {
       request.response.add(file.readAsBytesSync());
@@ -223,7 +223,7 @@ Future<List> testResponseAddClosed() {
   }, closeClient: true);
   completers.add(completer2.future);
 
-  final completer3 = new Completer<Null>();
+  final completer3 = Completer<Null>();
   testServerRequest((server, request) {
     int count = 0;
     write() {
@@ -249,8 +249,8 @@ Future<List> testResponseAddClosed() {
 }
 
 Future<List> testBadResponseAdd() {
-  final completers = new List<Future<Null>>();
-  final completer = new Completer<Null>();
+  final completers = List<Future<Null>>();
+  final completer = Completer<Null>();
   testServerRequest((server, request) {
     request.response.contentLength = 0;
     request.response.add([0]);
@@ -262,7 +262,7 @@ Future<List> testBadResponseAdd() {
   });
   completers.add(completer.future);
 
-  final completer2 = new Completer<Null>();
+  final completer2 = Completer<Null>();
   testServerRequest((server, request) {
     request.response.contentLength = 5;
     request.response.add([0, 0, 0]);
@@ -275,12 +275,12 @@ Future<List> testBadResponseAdd() {
   });
   completers.add(completer2.future);
 
-  final completer3 = new Completer<Null>();
+  final completer3 = Completer<Null>();
   testServerRequest((server, request) {
     request.response.contentLength = 0;
-    request.response.add(new Uint8List(64 * 1024));
-    request.response.add(new Uint8List(64 * 1024));
-    request.response.add(new Uint8List(64 * 1024));
+    request.response.add(Uint8List(64 * 1024));
+    request.response.add(Uint8List(64 * 1024));
+    request.response.add(Uint8List(64 * 1024));
     request.response.close();
     request.response.done.catchError((error) {
       server.close();
@@ -292,8 +292,8 @@ Future<List> testBadResponseAdd() {
 }
 
 Future<List> testBadResponseClose() {
-  final completers = new List<Future<Null>>();
-  final completer = new Completer<Null>();
+  final completers = List<Future<Null>>();
+  final completer = Completer<Null>();
   testServerRequest((server, request) {
     request.response.contentLength = 5;
     request.response.close();
@@ -304,7 +304,7 @@ Future<List> testBadResponseClose() {
   });
   completers.add(completer.future);
 
-  final completer2 = new Completer<Null>();
+  final completer2 = Completer<Null>();
   testServerRequest((server, request) {
     request.response.contentLength = 5;
     request.response.add([0]);
@@ -319,7 +319,7 @@ Future<List> testBadResponseClose() {
 }
 
 Future<Null> testIgnoreRequestData() {
-  final completer = new Completer<Null>();
+  final completer = Completer<Null>();
   HttpServer.bind("127.0.0.1", 0).then((server) {
     server.listen((request) {
       // Ignore request data.
@@ -327,10 +327,10 @@ Future<Null> testIgnoreRequestData() {
       request.response.close();
     });
 
-    var client = new HttpClient();
+    var client = HttpClient();
     client.get("127.0.0.1", server.port, "/").then((request) {
       request.contentLength = 1024 * 1024;
-      request.add(new Uint8List(1024 * 1024));
+      request.add(Uint8List(1024 * 1024));
       return request.close();
     }).then((response) {
       response.fold(0, (s, b) => s + b.length).then((bytes) {
@@ -344,7 +344,7 @@ Future<Null> testIgnoreRequestData() {
 }
 
 Future<Null> testWriteCharCode() {
-  final completer = new Completer<Null>();
+  final completer = Completer<Null>();
   testServerRequest((server, request) {
     // Test that default is latin-1 (only 2 bytes).
     request.response.writeCharCode(0xFF);
@@ -359,11 +359,11 @@ Future<Null> testWriteCharCode() {
 
 void main() {
   scriptSource =
-      new File('${Directory.current.path}/test/http_server_response_test.dart');
+      File('${Directory.current.path}/test/http_server_response_test.dart');
   if (!scriptSource.existsSync()) {
     // If we can't find the file relative to the cwd, then look relative
     // to Platform.script.
-    scriptSource = new File(
+    scriptSource = File(
         Platform.script.resolve('http_server_response_test.dart').toFilePath());
   }
   test('responseDone', () => testResponseDone());

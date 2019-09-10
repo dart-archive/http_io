@@ -12,7 +12,7 @@ import "package:test/test.dart";
 // server sets a content length but still needs to close the
 // connection as there is no keep alive.
 Future<Null> testHttp10NoKeepAlive() {
-  Completer<Null> completer = new Completer();
+  Completer<Null> completer = Completer();
   HttpServer.bind("127.0.0.1", 0).then((server) {
     server.listen((HttpRequest request) {
       expect(request.headers.value('content-length'), isNull);
@@ -41,7 +41,7 @@ Future<Null> testHttp10NoKeepAlive() {
         socket.listen(response.addAll, onDone: () {
           count++;
           socket.destroy();
-          String s = new String.fromCharCodes(response).toLowerCase();
+          String s = String.fromCharCodes(response).toLowerCase();
           expect(-1, equals(s.indexOf("keep-alive")));
           if (count < 10) {
             makeRequest();
@@ -62,7 +62,7 @@ Future<Null> testHttp10NoKeepAlive() {
 // content length so it has to close the connection to mark the end of
 // the response.
 Future<Null> testHttp10ServerClose() {
-  Completer<Null> completer = new Completer();
+  Completer<Null> completer = Completer();
   HttpServer.bind("127.0.0.1", 0).then((server) {
     server.listen((HttpRequest request) {
       expect(request.headers.value('content-length'), isNull);
@@ -90,7 +90,7 @@ Future<Null> testHttp10ServerClose() {
             onDone: () {
               socket.destroy();
               count++;
-              String s = new String.fromCharCodes(response).toLowerCase();
+              String s = String.fromCharCodes(response).toLowerCase();
               expect("z", equals(s[s.length - 1]));
               expect(-1, equals(s.indexOf("content-length:")));
               expect(-1, equals(s.indexOf("keep-alive")));
@@ -114,7 +114,7 @@ Future<Null> testHttp10ServerClose() {
 // server sets a content length so the persistent connection can be
 // used.
 Future<Null> testHttp10KeepAlive() {
-  Completer<Null> completer = new Completer();
+  Completer<Null> completer = Completer();
   HttpServer.bind("127.0.0.1", 0).then((server) {
     server.listen((HttpRequest request) {
       expect(request.headers.value('content-length'), isNull);
@@ -142,7 +142,7 @@ Future<Null> testHttp10KeepAlive() {
       socket.listen((d) {
         response.addAll(d);
         if (response[response.length - 1] == "Z".codeUnitAt(0)) {
-          String s = new String.fromCharCodes(response).toLowerCase();
+          String s = String.fromCharCodes(response).toLowerCase();
           expect(s.indexOf("\r\nconnection: keep-alive\r\n") > 0, isTrue);
           expect(s.indexOf("\r\ncontent-length: 1\r\n") > 0, isTrue);
           count++;
@@ -168,7 +168,7 @@ Future<Null> testHttp10KeepAlive() {
 // server does not set a content length so it cannot honor connection
 // keep alive.
 Future<Null> testHttp10KeepAliveServerCloses() {
-  Completer<Null> completer = new Completer();
+  Completer<Null> completer = Completer();
   HttpServer.bind("127.0.0.1", 0).then((server) {
     server.listen((HttpRequest request) {
       expect(request.headers.value('content-length'), isNull);
@@ -193,7 +193,7 @@ Future<Null> testHttp10KeepAliveServerCloses() {
         socket.listen(response.addAll, onDone: () {
           socket.destroy();
           count++;
-          String s = new String.fromCharCodes(response).toLowerCase();
+          String s = String.fromCharCodes(response).toLowerCase();
           expect("z", equals(s[s.length - 1]));
           expect(-1, equals(s.indexOf("content-length")));
           expect(-1, equals(s.indexOf("connection")));

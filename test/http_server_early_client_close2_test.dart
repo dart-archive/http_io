@@ -9,15 +9,15 @@ import 'package:http_io/http_io.dart';
 import 'package:test/test.dart';
 
 Future<Null> httpServerEarlyClientClose2() {
-  final completer = new Completer<Null>();
+  final completer = Completer<Null>();
   HttpServer.bind("127.0.0.1", 0).then((server) {
     server.listen((request) {
       String name =
           '${Directory.current.path}/test/http_server_early_client_close2_test.dart';
-      if (!new File(name).existsSync()) {
+      if (!File(name).existsSync()) {
         name = Platform.script.toFilePath();
       }
-      new File(name)
+      File(name)
           .openRead()
           .cast<List<int>>()
           .pipe(request.response)

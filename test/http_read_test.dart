@@ -10,7 +10,7 @@ import 'package:test/test.dart';
 
 class IsolatedHttpServer {
   IsolatedHttpServer()
-      : _statusPort = new ReceivePort(),
+      : _statusPort = ReceivePort(),
         _serverPort = null;
 
   void setServerStartedHandler(void startedCallback(int port)) {
@@ -18,7 +18,7 @@ class IsolatedHttpServer {
   }
 
   void start([bool chunkedEncoding = false]) {
-    ReceivePort receivePort = new ReceivePort();
+    ReceivePort receivePort = ReceivePort();
     Isolate.spawn(startIsolatedHttpServer, receivePort.sendPort);
     receivePort.first.then((port) {
       _serverPort = port;
@@ -26,13 +26,13 @@ class IsolatedHttpServer {
       if (chunkedEncoding) {
         // Send chunked encoding message to the server.
         port.send([
-          new IsolatedHttpServerCommand.chunkedEncoding(),
+          IsolatedHttpServerCommand.chunkedEncoding(),
           _statusPort.sendPort
         ]);
       }
 
       // Send server start message to the server.
-      var command = new IsolatedHttpServerCommand.start();
+      var command = IsolatedHttpServerCommand.start();
       port.send([command, _statusPort.sendPort]);
     });
 
@@ -46,12 +46,11 @@ class IsolatedHttpServer {
 
   void shutdown() {
     // Send server stop message to the server.
-    _serverPort
-        .send([new IsolatedHttpServerCommand.stop(), _statusPort.sendPort]);
+    _serverPort.send([IsolatedHttpServerCommand.stop(), _statusPort.sendPort]);
     _statusPort.close();
   }
 
-  ReceivePort _statusPort; // Port for receiving messages from the server.
+  final ReceivePort _statusPort; // Port for receiving messages from the server.
   SendPort _serverPort; // Port for sending messages to the server.
   void Function(int) _startedCallback;
 }
@@ -69,7 +68,7 @@ class IsolatedHttpServerCommand {
   bool get isStop => _command == STOP;
   bool get isChunkedEncoding => _command == CHUNKED_ENCODING;
 
-  int _command;
+  final int _command;
 }
 
 class IsolatedHttpServerStatus {
@@ -77,23 +76,27 @@ class IsolatedHttpServerStatus {
   static const STOPPED = 1;
   static const ERROR = 2;
 
-  IsolatedHttpServerStatus.started(this._port) : _state = STARTED;
-  IsolatedHttpServerStatus.stopped() : _state = STOPPED;
-  IsolatedHttpServerStatus.error() : _state = ERROR;
+  IsolatedHttpServerStatus.started(this.port) : _state = STARTED;
+
+  IsolatedHttpServerStatus.stopped()
+      : port = null,
+        _state = STOPPED;
+
+  IsolatedHttpServerStatus.error()
+      : port = null,
+        _state = ERROR;
 
   bool get isStarted => _state == STARTED;
   bool get isStopped => _state == STOPPED;
   bool get isError => _state == ERROR;
 
-  int get port => _port;
-
-  int _state;
-  int _port;
+  final int _state;
+  final int port;
 }
 
 void startIsolatedHttpServer(Object replyToObj) {
   SendPort replyTo = replyToObj;
-  var server = new TestServer();
+  var server = TestServer();
   server.init();
   replyTo.send(server.dispatchSendPort);
 }
@@ -120,9 +123,9 @@ class TestServer {
 
   void init() {
     // Setup request handlers.
-    _requestHandlers = new Map();
+    _requestHandlers = Map();
     _requestHandlers["/echo"] = _echoHandler;
-    _dispatchPort = new ReceivePort();
+    _dispatchPort = ReceivePort();
     _dispatchPort.listen(dispatch);
   }
 
@@ -136,15 +139,15 @@ class TestServer {
         HttpServer.bind("127.0.0.1", 0).then((server) {
           _server = server;
           _server.listen(_requestReceivedHandler);
-          replyTo.send(new IsolatedHttpServerStatus.started(_server.port));
+          replyTo.send(IsolatedHttpServerStatus.started(_server.port));
         });
       } catch (e) {
-        replyTo.send(new IsolatedHttpServerStatus.error());
+        replyTo.send(IsolatedHttpServerStatus.error());
       }
     } else if (command.isStop) {
       _server.close();
       _dispatchPort.close();
-      replyTo.send(new IsolatedHttpServerStatus.stopped());
+      replyTo.send(IsolatedHttpServerStatus.stopped());
     }
   }
 
@@ -163,15 +166,15 @@ class TestServer {
 }
 
 Future<Null> testRead(bool chunkedEncoding) {
-  final completer = new Completer<Null>();
+  final completer = Completer<Null>();
   String data = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
   final int kMessageCount = 10;
 
-  IsolatedHttpServer server = new IsolatedHttpServer();
+  IsolatedHttpServer server = IsolatedHttpServer();
 
   void runTest(int port) {
     int count = 0;
-    HttpClient httpClient = new HttpClient();
+    HttpClient httpClient = HttpClient();
     void sendRequest() {
       httpClient.post("127.0.0.1", port, "/echo").then((request) {
         if (chunkedEncoding) {
@@ -184,9 +187,9 @@ Future<Null> testRead(bool chunkedEncoding) {
         return request.close();
       }).then((response) {
         expect(HttpStatus.OK, equals(response.statusCode));
-        List<int> body = new List<int>();
+        List<int> body = List<int>();
         response.listen(body.addAll, onDone: () {
-          expect(data, equals(new String.fromCharCodes(body)));
+          expect(data, equals(String.fromCharCodes(body)));
           count++;
           if (count < kMessageCount) {
             sendRequest();

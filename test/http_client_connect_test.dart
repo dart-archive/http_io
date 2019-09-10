@@ -9,13 +9,13 @@ import "package:http_io/http_io.dart";
 import "package:test/test.dart";
 
 Future<Null> testGetEmptyRequest() {
-  Completer<Null> completer = new Completer();
+  Completer<Null> completer = Completer();
   HttpServer.bind("127.0.0.1", 0).then((server) {
     server.listen((request) {
       request.pipe(request.response);
     });
 
-    var client = new HttpClient();
+    var client = HttpClient();
     client
         .get("127.0.0.1", server.port, "/")
         .then((request) => request.close())
@@ -30,7 +30,7 @@ Future<Null> testGetEmptyRequest() {
 }
 
 Future<Null> testGetDataRequest() {
-  Completer<Null> completer = new Completer();
+  Completer<Null> completer = Completer();
   HttpServer.bind("127.0.0.1", 0).then((server) {
     var data = "lalala".codeUnits;
     server.listen((request) {
@@ -38,7 +38,7 @@ Future<Null> testGetDataRequest() {
       request.pipe(request.response);
     });
 
-    var client = new HttpClient();
+    var client = HttpClient();
     client
         .get("127.0.0.1", server.port, "/")
         .then((request) => request.close())
@@ -55,8 +55,8 @@ Future<Null> testGetDataRequest() {
 }
 
 Future<Null> testGetInvalidHost() {
-  Completer<Null> completer = new Completer();
-  var client = new HttpClient();
+  Completer<Null> completer = Completer();
+  var client = HttpClient();
   client.get("__SOMETHING_INVALID__", 8888, "/").catchError((error) {
     client.close();
     completer.complete(null);
@@ -65,16 +65,16 @@ Future<Null> testGetInvalidHost() {
 }
 
 Future<Null> testGetServerClose() {
-  Completer<Null> completer = new Completer();
+  Completer<Null> completer = Completer();
   HttpServer.bind("127.0.0.1", 0).then((server) {
     server.listen((request) {
       server.close();
-      new Timer(const Duration(milliseconds: 100), () {
+      Timer(const Duration(milliseconds: 100), () {
         request.response.close();
       });
     });
 
-    var client = new HttpClient();
+    var client = HttpClient();
     client
         .get("127.0.0.1", server.port, "/")
         .then((request) => request.close())
@@ -85,8 +85,8 @@ Future<Null> testGetServerClose() {
 }
 
 Future<Null> testGetServerCloseNoKeepAlive() {
-  Completer<Null> completer = new Completer();
-  var client = new HttpClient();
+  Completer<Null> completer = Completer();
+  var client = HttpClient();
   HttpServer.bind("127.0.0.1", 0).then((server) {
     int port = server.port;
     server.first.then((request) => request.response.close());
@@ -104,13 +104,13 @@ Future<Null> testGetServerCloseNoKeepAlive() {
 }
 
 Future<Null> testGetServerForceClose() {
-  Completer<Null> completer = new Completer();
+  Completer<Null> completer = Completer();
   HttpServer.bind("127.0.0.1", 0).then((server) {
     server.listen((request) {
       server.close(force: true);
     });
 
-    var client = new HttpClient();
+    var client = HttpClient();
     client
         .get("127.0.0.1", server.port, "/")
         .then((request) => request.close())
@@ -123,8 +123,8 @@ Future<Null> testGetServerForceClose() {
 }
 
 Future<Null> testGetDataServerForceClose() {
-  Completer<Null> testCompleter = new Completer();
-  var completer = new Completer();
+  Completer<Null> testCompleter = Completer();
+  var completer = Completer();
   HttpServer.bind("127.0.0.1", 0).then((server) {
     server.listen((request) {
       request.response.bufferOutput = false;
@@ -134,7 +134,7 @@ Future<Null> testGetDataServerForceClose() {
       completer.future.then((_) => server.close(force: true));
     });
 
-    var client = new HttpClient();
+    var client = HttpClient();
     client
         .get("127.0.0.1", server.port, "/")
         .then((request) => request.close())
@@ -154,9 +154,10 @@ Future<Null> testGetDataServerForceClose() {
   return testCompleter.future;
 }
 
-typedef Future<HttpClientRequest> Callback1(String a1, int a2, String a3);
+typedef Callback1 = Future<HttpClientRequest> Function(
+    String a1, int a2, String a3);
 Future<Null> testOpenEmptyRequest() async {
-  var client = new HttpClient();
+  var client = HttpClient();
   var methods = [
     [client.get, 'GET'],
     [client.post, 'POST'],
@@ -167,7 +168,7 @@ Future<Null> testOpenEmptyRequest() async {
   ];
 
   for (var method in methods) {
-    Completer<Null> completer = new Completer();
+    Completer<Null> completer = Completer();
     await HttpServer.bind("127.0.0.1", 0).then((server) {
       server.listen((request) {
         expect(method[1], equals(request.method));
@@ -188,9 +189,9 @@ Future<Null> testOpenEmptyRequest() async {
   }
 }
 
-typedef Future<HttpClientRequest> Callback2(Uri a1);
+typedef Callback2 = Future<HttpClientRequest> Function(Uri a1);
 Future<Null> testOpenUrlEmptyRequest() async {
-  var client = new HttpClient();
+  var client = HttpClient();
   var methods = [
     [client.getUrl, 'GET'],
     [client.postUrl, 'POST'],
@@ -201,7 +202,7 @@ Future<Null> testOpenUrlEmptyRequest() async {
   ];
 
   for (var method in methods) {
-    Completer<Null> completer = new Completer();
+    Completer<Null> completer = Completer();
     await HttpServer.bind("127.0.0.1", 0).then((server) {
       server.listen((request) {
         expect(method[1], equals(request.method));
@@ -223,7 +224,7 @@ Future<Null> testOpenUrlEmptyRequest() async {
 }
 
 Future<Null> testNoBuffer() {
-  Completer<Null> completer = new Completer();
+  Completer<Null> completer = Completer();
   HttpServer.bind("127.0.0.1", 0).then((server) {
     HttpResponse response;
     server.listen((request) {
@@ -232,13 +233,13 @@ Future<Null> testNoBuffer() {
       response.writeln('init');
     });
 
-    var client = new HttpClient();
+    var client = HttpClient();
     client
         .get("127.0.0.1", server.port, "/")
         .then((request) => request.close())
         .then((clientResponse) {
-      var iterator = new StreamIterator(
-          clientResponse.transform(utf8.decoder).transform(new LineSplitter()));
+      var iterator = StreamIterator(
+          clientResponse.transform(utf8.decoder).transform(LineSplitter()));
       iterator.moveNext().then((hasValue) {
         expect(hasValue, isTrue);
         expect('init', equals(iterator.current));
@@ -270,7 +271,7 @@ Future<Null> testNoBuffer() {
 }
 
 Future<Null> testMaxConnectionsPerHost(int connectionCap, int connections) {
-  Completer<Null> completer = new Completer();
+  Completer<Null> completer = Completer();
   HttpServer.bind("127.0.0.1", 0).then((server) {
     int handled = 0;
     server.listen((request) {
@@ -283,7 +284,7 @@ Future<Null> testMaxConnectionsPerHost(int connectionCap, int connections) {
       }
     });
 
-    var client = new HttpClient();
+    var client = HttpClient();
     client.maxConnectionsPerHost = connectionCap;
     for (int i = 0; i < connections; i++) {
       client

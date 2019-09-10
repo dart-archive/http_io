@@ -35,7 +35,7 @@ Future<Null> testDefaultResponseHeaders() {
 
   doTest(bool clearHeaders, Map<String, dynamic> defaultHeaders,
       Function checker) {
-    Completer<Null> completer = new Completer();
+    Completer<Null> completer = Completer();
     HttpServer.bind("127.0.0.1", 0).then((server) {
       if (clearHeaders) server.defaultResponseHeaders.clear();
       if (defaultHeaders != null) {
@@ -47,7 +47,7 @@ Future<Null> testDefaultResponseHeaders() {
         request.response.close();
       });
 
-      HttpClient client = new HttpClient();
+      HttpClient client = HttpClient();
       client
           .get("127.0.0.1", server.port, "/")
           .then((request) => request.close())
@@ -68,7 +68,7 @@ Future<Null> testDefaultResponseHeaders() {
 
 Future<Null> testDefaultResponseHeadersContentType() {
   doTest(bool clearHeaders, String requestBody, List<int> responseBody) {
-    Completer<Null> completer = new Completer();
+    Completer<Null> completer = Completer();
     HttpServer.bind("127.0.0.1", 0).then((server) {
       if (clearHeaders) server.defaultResponseHeaders.clear();
       server.listen((request) {
@@ -76,7 +76,7 @@ Future<Null> testDefaultResponseHeadersContentType() {
         request.response.close();
       });
 
-      HttpClient client = new HttpClient();
+      HttpClient client = HttpClient();
       client
           .get("127.0.0.1", server.port, "/")
           .then((request) => request.close())
@@ -98,14 +98,14 @@ Future<Null> testDefaultResponseHeadersContentType() {
 }
 
 Future<Null> testListenOn() {
-  Completer<Null> completer = new Completer();
+  Completer<Null> completer = Completer();
   ServerSocket socket;
   HttpServer server;
 
   void doTest(void onDone()) {
     expect(socket.port, equals(server.port));
 
-    HttpClient client = new HttpClient();
+    HttpClient client = HttpClient();
     client.get("127.0.0.1", socket.port, "/").then((request) {
       return request.close();
     }).then((response) {
@@ -123,7 +123,7 @@ Future<Null> testListenOn() {
   // Test two connection after each other.
   ServerSocket.bind("127.0.0.1", 0).then((s) {
     socket = s;
-    server = new HttpServer.listenOn(socket);
+    server = HttpServer.listenOn(socket);
     expect(server.address.address, equals('127.0.0.1'));
     expect(server.address.host, equals('127.0.0.1'));
     server.listen((HttpRequest request) {
@@ -144,7 +144,7 @@ Future<Null> testListenOn() {
 }
 
 Future<Null> testHttpServerZone() {
-  Completer<Null> completer = new Completer();
+  Completer<Null> completer = Completer();
   Zone parent = Zone.current;
   runZoned(() {
     expect(parent, isNot(equals(Zone.current)));
@@ -155,7 +155,7 @@ Future<Null> testHttpServerZone() {
         request.response.close();
         server.close();
       });
-      new HttpClient()
+      HttpClient()
           .get("127.0.0.1", server.port, '/')
           .then((request) => request.close())
           .then((response) => response.drain())
@@ -166,7 +166,7 @@ Future<Null> testHttpServerZone() {
 }
 
 Future<Null> testHttpServerZoneError() {
-  Completer<Null> completer = new Completer();
+  Completer<Null> completer = Completer();
   Zone parent = Zone.current;
   runZoned(() {
     expect(parent, isNot(equals(Zone.current)));
@@ -194,13 +194,13 @@ Future<Null> testHttpServerZoneError() {
 }
 
 Future<Null> testHttpServerClientClose() {
-  Completer<Null> completer = new Completer();
+  Completer<Null> completer = Completer();
   HttpServer.bind("127.0.0.1", 0).then((server) {
     runZoned(() {
       server.listen((request) {
         request.response.bufferOutput = false;
-        request.response.add(new Uint8List(64 * 1024));
-        new Timer(const Duration(milliseconds: 100), () {
+        request.response.add(Uint8List(64 * 1024));
+        Timer(const Duration(milliseconds: 100), () {
           request.response.close().then((_) {
             server.close();
             completer.complete(null);
@@ -210,7 +210,7 @@ Future<Null> testHttpServerClientClose() {
     }, onError: (e, s) {
       fail("Unexpected error: $e(${e.hashCode})\n$s");
     });
-    var client = new HttpClient();
+    var client = HttpClient();
     client
         .get("127.0.0.1", server.port, "/")
         .then((request) => request.close())

@@ -11,7 +11,7 @@ void doExpect(HttpClient client, String url, String error) {
 }
 
 void testInvalidUrl() {
-  HttpClient client = new HttpClient();
+  HttpClient client = HttpClient();
   List<List<String>> tests = <List<String>>[
     <String>["ftp://www.google.com", "Unsupported scheme"],
     <String>["httpx://www.google.com", "Unsupported scheme"],
@@ -30,7 +30,7 @@ void testInvalidUrl() {
 }
 
 void testBadHostName() {
-  HttpClient client = new HttpClient();
+  HttpClient client = HttpClient();
   expect(() => client.get("some.bad.host.name.7654321", 0, "/"),
       throwsA(predicate((e) => e.toString().contains("Failed host lookup"))));
 }

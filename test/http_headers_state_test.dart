@@ -8,13 +8,13 @@ import 'package:http_io/http_io.dart';
 import 'package:test/test.dart';
 
 Future<Null> runTest(int totalConnections, [String body]) {
-  final completer = new Completer<Null>();
+  final completer = Completer<Null>();
   HttpServer.bind("127.0.0.1", 0).then((server) async {
     server.listen((HttpRequest request) {
       HttpResponse response = request.response;
       // Cannot mutate request headers.
       expect(() => request.headers.add("X-Request-Header", "value"),
-          throwsA(new TypeMatcher<HttpException>()));
+          throwsA(TypeMatcher<HttpException>()));
       expect("value", request.headers.value("X-Request-Header"));
       request.listen((_) {}, onDone: () {
         // Can still mutate response headers as long as no data has been sent.
@@ -26,7 +26,7 @@ Future<Null> runTest(int totalConnections, [String body]) {
           expect(() => response.reasonPhrase = "OK", throwsStateError);
           // Cannot mutate response headers when data has been sent.
           expect(() => response.headers.add("X-Request-Header", "value2"),
-              throwsA(new TypeMatcher<HttpException>()));
+              throwsA(TypeMatcher<HttpException>()));
         }
         response..close();
         // Cannot change state or reason after connection is closed.
@@ -34,12 +34,12 @@ Future<Null> runTest(int totalConnections, [String body]) {
         expect(() => response.reasonPhrase = "OK", throwsStateError);
         // Cannot mutate response headers after connection is closed.
         expect(() => response.headers.add("X-Request-Header", "value3"),
-            throwsA(new TypeMatcher<HttpException>()));
+            throwsA(TypeMatcher<HttpException>()));
       });
     });
 
     int count = 0;
-    HttpClient client = new HttpClient();
+    HttpClient client = HttpClient();
     for (int i = 0; i < totalConnections; i++) {
       await client
           .get("127.0.0.1", server.port, "/")
@@ -53,17 +53,17 @@ Future<Null> runTest(int totalConnections, [String body]) {
           request.write(body);
           // Cannot mutate request headers when data has been sent.
           expect(() => request.headers.add("X-Request-Header", "value2"),
-              throwsA(new TypeMatcher<HttpException>()));
+              throwsA(TypeMatcher<HttpException>()));
         }
         request.close();
         // Cannot mutate request headers when data has been sent.
         expect(() => request.headers.add("X-Request-Header", "value3"),
-            throwsA(new TypeMatcher<HttpException>()));
+            throwsA(TypeMatcher<HttpException>()));
         return request.done;
       }).then((HttpClientResponse response) {
         // Cannot mutate response headers.
         expect(() => response.headers.add("X-Response-Header", "value"),
-            throwsA(new TypeMatcher<HttpException>()));
+            throwsA(TypeMatcher<HttpException>()));
         expect("value", response.headers.value("X-Response-Header"));
         response.listen((_) {}, onDone: () {
           // Do not close the connections before we have read the
