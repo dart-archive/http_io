@@ -9,7 +9,7 @@ import "package:http_io/http_io.dart";
 import "package:test/test.dart";
 
 Future<Null> testHttp10Close(bool closeRequest) {
-  Completer<Null> completer = new Completer();
+  Completer<Null> completer = Completer();
   HttpServer.bind("127.0.0.1", 0).then((server) {
     server.listen((request) {
       request.response.close();
@@ -29,7 +29,7 @@ Future<Null> testHttp10Close(bool closeRequest) {
 }
 
 Future<Null> testHttp11Close(bool closeRequest) {
-  Completer<Null> completer = new Completer();
+  Completer<Null> completer = Completer();
   HttpServer.bind("127.0.0.1", 0).then((server) {
     server.listen((request) {
       request.response.close();
@@ -49,19 +49,19 @@ Future<Null> testHttp11Close(bool closeRequest) {
 }
 
 Future<Null> testStreamResponse() {
-  Completer<Null> completer = new Completer();
+  Completer<Null> completer = Completer();
   HttpServer.bind("127.0.0.1", 0).then((server) {
     server.listen((request) {
-      var timer = new Timer.periodic(const Duration(milliseconds: 0), (_) {
+      var timer = Timer.periodic(const Duration(milliseconds: 0), (_) {
         request.response
-            .write('data:${new DateTime.now().millisecondsSinceEpoch}\n\n');
+            .write('data:${DateTime.now().millisecondsSinceEpoch}\n\n');
       });
       request.response.done.whenComplete(() {
         timer.cancel();
       }).catchError((_) {});
     });
 
-    var client = new HttpClient();
+    var client = HttpClient();
     client
         .getUrl(Uri.parse("http://127.0.0.1:${server.port}"))
         .then((request) => request.close())

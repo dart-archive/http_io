@@ -9,11 +9,13 @@ import 'package:http_io/http_io.dart';
 import 'package:test/test.dart';
 
 Future<Null> testChunkedBufferSizeMsg() {
-  final completer = new Completer<Null>();
+  final completer = Completer<Null>();
   // Buffer of same size as our internal buffer, minus 4. Makes us hit the
   // boundary.
-  var sendData = new Uint8List(8 * 1024 - 4);
-  for (int i = 0; i < sendData.length; i++) sendData[i] = i % 256;
+  var sendData = Uint8List(8 * 1024 - 4);
+  for (int i = 0; i < sendData.length; i++) {
+    sendData[i] = i % 256;
+  }
 
   HttpServer.bind('127.0.0.1', 0).then((server) {
     server.listen((request) {
@@ -29,7 +31,7 @@ Future<Null> testChunkedBufferSizeMsg() {
       request.response.add(sendData);
       request.response.close();
     });
-    var client = new HttpClient();
+    var client = HttpClient();
     client.get('127.0.0.1', server.port, '/').then((request) {
       request.headers.set(HttpHeaders.ACCEPT_ENCODING, "");
       return request.close();

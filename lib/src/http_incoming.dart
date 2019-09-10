@@ -9,7 +9,7 @@ import 'http_headers_impl.dart';
 
 class HttpIncoming extends Stream<List<int>> {
   final int _transferLength;
-  final _dataCompleter = new Completer<bool>();
+  final _dataCompleter = Completer<bool>();
   final Stream<List<int>> _stream;
 
   bool fullBodyRead = false;
@@ -40,7 +40,7 @@ class HttpIncoming extends Stream<List<int>> {
       {Function onError, void onDone(), bool cancelOnError}) {
     hasSubscriber = true;
     return _stream.handleError((error) {
-      throw new HttpException(error.message, uri: uri);
+      throw HttpException(error.message, uri: uri);
     }).listen(onData,
         onError: onError, onDone: onDone, cancelOnError: cancelOnError);
   }

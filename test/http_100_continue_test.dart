@@ -33,7 +33,7 @@ Future<Null> doTest(responseBytes, bodyLength) async {
   var server = await ServerSocket.bind('127.0.0.1', 0);
   server.listen(handleSocket);
 
-  var client = new HttpClient();
+  var client = HttpClient();
   var request =
       await client.getUrl(Uri.parse('http://127.0.0.1:${server.port}/'));
   var response = await request.close();

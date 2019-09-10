@@ -12,7 +12,7 @@ Future<Null> testBindShared(String host, bool v6Only) async {
   // Sent a single request using a new HttpClient to ensure a new TCP
   // connection is used.
   Future singleRequest(host, port, statusCode) async {
-    var client = new HttpClient();
+    var client = HttpClient();
     var request = await client.open('GET', host, port, '/');
     var response = await request.close();
     await response.drain();
@@ -20,8 +20,8 @@ Future<Null> testBindShared(String host, bool v6Only) async {
     client.close(force: true);
   }
 
-  Completer server1Request = new Completer();
-  Completer server2Request = new Completer();
+  Completer server1Request = Completer();
+  Completer server2Request = Completer();
 
   var server1 = await HttpServer.bind(host, 0, v6Only: v6Only, shared: true);
   var port = server1.port;

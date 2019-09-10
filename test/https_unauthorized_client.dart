@@ -17,14 +17,14 @@ class ExpectException implements Exception {
 
 void expect(condition, message) {
   if (!condition) {
-    throw new ExpectException(message);
+    throw ExpectException(message);
   }
 }
 
 const HOST_NAME = "localhost";
 
 Future<Null> runClients(int port) async {
-  HttpClient client = new HttpClient();
+  HttpClient client = HttpClient();
   for (int i = 0; i < 20; ++i) {
     await client.getUrl(Uri.parse('https://$HOST_NAME:$port/')).then(
         (HttpClientRequest request) {

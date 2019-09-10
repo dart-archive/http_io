@@ -10,7 +10,7 @@ import "package:http_io/http_io.dart";
 import "package:test/test.dart";
 
 Future<Null> testClientAndServerCloseNoListen(int connections) {
-  Completer<Null> completer = new Completer();
+  Completer<Null> completer = Completer();
   HttpServer.bind("127.0.0.1", 0).then((server) {
     int closed = 0;
     server.listen((request) {
@@ -26,7 +26,7 @@ Future<Null> testClientAndServerCloseNoListen(int connections) {
         }
       });
     });
-    var client = new HttpClient();
+    var client = HttpClient();
     for (int i = 0; i < connections; i++) {
       client
           .get("127.0.0.1", server.port, "/")
@@ -38,7 +38,7 @@ Future<Null> testClientAndServerCloseNoListen(int connections) {
 }
 
 Future<Null> testClientCloseServerListen(int connections) {
-  Completer<Null> completer = new Completer();
+  Completer<Null> completer = Completer();
   HttpServer.bind("127.0.0.1", 0).then((server) {
     int closed = 0;
     void check() {
@@ -58,7 +58,7 @@ Future<Null> testClientCloseServerListen(int connections) {
         request.response.done.then((_) => check());
       });
     });
-    var client = new HttpClient();
+    var client = HttpClient();
     for (int i = 0; i < connections; i++) {
       client
           .get("127.0.0.1", server.port, "/")
@@ -70,9 +70,9 @@ Future<Null> testClientCloseServerListen(int connections) {
 }
 
 Future<Null> testClientCloseSendingResponse(int connections) {
-  Completer<Null> completer = new Completer();
-  var buffer = new Uint8List(64 * 1024);
-  var rand = new Random();
+  Completer<Null> completer = Completer();
+  var buffer = Uint8List(64 * 1024);
+  var rand = Random();
   for (int i = 0; i < buffer.length; i++) {
     buffer[i] = rand.nextInt(256);
   }
@@ -91,7 +91,7 @@ Future<Null> testClientCloseSendingResponse(int connections) {
     }
 
     server.listen((request) {
-      var timer = new Timer.periodic(const Duration(milliseconds: 50), (_) {
+      var timer = Timer.periodic(const Duration(milliseconds: 50), (_) {
         request.response.add(buffer);
       });
       request.response.done.catchError((_) {}).whenComplete(() {
@@ -99,7 +99,7 @@ Future<Null> testClientCloseSendingResponse(int connections) {
         timer.cancel();
       });
     });
-    var client = new HttpClient();
+    var client = HttpClient();
     for (int i = 0; i < connections; i++) {
       client
           .get("127.0.0.1", server.port, "/")
@@ -108,7 +108,7 @@ Future<Null> testClientCloseSendingResponse(int connections) {
         // Ensure we don't accept the response until we have send the entire
         // request.
         var subscription = response.listen((_) {});
-        new Timer(const Duration(milliseconds: 20), () {
+        Timer(const Duration(milliseconds: 20), () {
           subscription.cancel();
           check();
         });
@@ -119,7 +119,7 @@ Future<Null> testClientCloseSendingResponse(int connections) {
 }
 
 Future<Null> testClientCloseWhileSendingRequest(int connections) {
-  Completer<Null> completer = new Completer();
+  Completer<Null> completer = Completer();
   HttpServer.bind("127.0.0.1", 0).then((server) async {
     server.listen((request) {
       request.listen((_) {}, onError: (e) {
@@ -128,7 +128,7 @@ Future<Null> testClientCloseWhileSendingRequest(int connections) {
         expect(e is HttpException, isTrue);
       });
     });
-    var client = new HttpClient();
+    var client = HttpClient();
     int closed = 0;
     for (int i = 0; i < connections; i++) {
       await client.post("127.0.0.1", server.port, "/").then((request) {

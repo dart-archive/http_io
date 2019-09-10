@@ -20,5 +20,7 @@ void main(List<String> arguments) {
     });
   }
 
-  for (int i = 0; i < 4; i++) run();
+  for (int i = 0; i < 4; i++) {
+    run();
+  }
 }

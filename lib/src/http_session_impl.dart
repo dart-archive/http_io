@@ -25,10 +25,9 @@ class HttpSessionImpl implements HttpSession {
   HttpSessionImpl _next;
   final String id;
 
-  final Map _data = new HashMap();
+  final Map _data = HashMap();
 
-  HttpSessionImpl(this._sessionManager, this.id)
-      : _lastSeen = new DateTime.now();
+  HttpSessionImpl(this._sessionManager, this.id) : _lastSeen = DateTime.now();
 
   void destroy() {
     destroyed = true;
@@ -39,7 +38,7 @@ class HttpSessionImpl implements HttpSession {
   // Mark the session as seen. This will reset the timeout and move the node to
   // the end of the timeout queue.
   void markSeen() {
-    _lastSeen = new DateTime.now();
+    _lastSeen = DateTime.now();
     _sessionManager._bumpToEnd(this);
   }
 
@@ -51,7 +50,7 @@ class HttpSessionImpl implements HttpSession {
     _isNew = false;
   }
 
-  void set onTimeout(void callback()) {
+  set onTimeout(void callback()) {
     _timeoutCallback = callback;
   }
 
@@ -133,12 +132,12 @@ class HttpSessionManager {
     while (_sessions.containsKey(id)) {
       id = createSessionId();
     }
-    var session = _sessions[id] = new HttpSessionImpl(this, id);
+    var session = _sessions[id] = HttpSessionImpl(this, id);
     _addToTimeoutQueue(session);
     return session;
   }
 
-  void set sessionTimeout(int timeout) {
+  set sessionTimeout(int timeout) {
     _sessionTimeout = timeout;
     _stopTimer();
     _startTimer();
@@ -200,9 +199,9 @@ class HttpSessionManager {
   void _startTimer() {
     assert(_timer == null);
     if (_head != null) {
-      int seconds = new DateTime.now().difference(_head.lastSeen).inSeconds;
-      _timer = new Timer(
-          new Duration(seconds: _sessionTimeout - seconds), _timerTimeout);
+      int seconds = DateTime.now().difference(_head.lastSeen).inSeconds;
+      _timer =
+          Timer(Duration(seconds: _sessionTimeout - seconds), _timerTimeout);
     }
   }
 

@@ -13,7 +13,7 @@ class Server {
   bool passwordChanged = false;
 
   Future<Server> start() {
-    var completer = new Completer<Server>();
+    var completer = Completer<Server>();
     HttpServer.bind("127.0.0.1", 0).then((s) {
       server = s;
       server.listen((HttpRequest request) {
@@ -67,13 +67,13 @@ class Server {
 }
 
 Future<Server> setupServer() {
-  return new Server().start();
+  return Server().start();
 }
 
 Future<Null> testUrlUserInfo() {
-  Completer<Null> completer = new Completer();
+  Completer<Null> completer = Completer();
   setupServer().then((server) {
-    HttpClient client = new HttpClient();
+    HttpClient client = HttpClient();
 
     client
         .getUrl(Uri.parse("http://username:password@127.0.0.1:${server.port}/"))
@@ -90,9 +90,9 @@ Future<Null> testUrlUserInfo() {
 }
 
 Future<Null> testBasicNoCredentials() {
-  Completer<Null> completer = new Completer();
+  Completer<Null> completer = Completer();
   setupServer().then((server) {
-    HttpClient client = new HttpClient();
+    HttpClient client = HttpClient();
 
     Future makeRequest(Uri url) {
       return client
@@ -121,9 +121,9 @@ Future<Null> testBasicNoCredentials() {
 }
 
 Future<Null> testBasicCredentials() {
-  Completer<Null> completer = new Completer();
+  Completer<Null> completer = Completer();
   setupServer().then((server) {
-    HttpClient client = new HttpClient();
+    HttpClient client = HttpClient();
 
     Future makeRequest(Uri url) {
       return client
@@ -137,7 +137,7 @@ Future<Null> testBasicCredentials() {
 
     for (int i = 0; i < 5; i++) {
       client.addCredentials(Uri.parse("http://127.0.0.1:${server.port}/test$i"),
-          "realm", new HttpClientBasicCredentials("test$i", "test$i"));
+          "realm", HttpClientBasicCredentials("test$i", "test$i"));
     }
 
     var futures = <Future>[];
@@ -157,9 +157,9 @@ Future<Null> testBasicCredentials() {
 }
 
 Future<Null> testBasicAuthenticateCallback() {
-  Completer<Null> completer = new Completer();
+  Completer<Null> completer = Completer();
   setupServer().then((server) {
-    HttpClient client = new HttpClient();
+    HttpClient client = HttpClient();
     bool passwordChanged = false;
 
     client.authenticate = (Uri url, String scheme, String realm) {
@@ -168,10 +168,10 @@ Future<Null> testBasicAuthenticateCallback() {
       String username = url.path.substring(1, 6);
       String password = url.path.substring(1, 6);
       if (passwordChanged) password = "${password}1";
-      Completer<bool> completer = new Completer<bool>();
-      new Timer(const Duration(milliseconds: 10), () {
+      Completer<bool> completer = Completer<bool>();
+      Timer(const Duration(milliseconds: 10), () {
         client.addCredentials(
-            url, realm, new HttpClientBasicCredentials(username, password));
+            url, realm, HttpClientBasicCredentials(username, password));
         completer.complete(true);
       });
       return completer.future;

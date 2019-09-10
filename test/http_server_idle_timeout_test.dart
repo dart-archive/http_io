@@ -9,7 +9,7 @@ import 'package:http_io/http_io.dart';
 import 'package:test/test.dart';
 
 Future<Null> testTimeoutAfterRequest() {
-  final completer = new Completer<Null>();
+  final completer = Completer<Null>();
   HttpServer.bind("127.0.0.1", 0).then((server) {
     server.idleTimeout = null;
 
@@ -32,7 +32,7 @@ Future<Null> testTimeoutAfterRequest() {
 }
 
 Future<Null> testTimeoutBeforeRequest() {
-  final completer = new Completer<Null>();
+  final completer = Completer<Null>();
   HttpServer.bind("127.0.0.1", 0).then((server) {
     server.idleTimeout = const Duration(milliseconds: 100);
 

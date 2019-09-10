@@ -9,15 +9,15 @@ import 'dart:typed_data';
 import "package:http_io/http_io.dart";
 import "package:test/test.dart";
 
-Future<Null> testWithData(List<int> data, {bool clientAutoUncompress: true}) {
-  Completer<Null> completer = new Completer();
+Future<Null> testWithData(List<int> data, {bool clientAutoUncompress = true}) {
+  Completer<Null> completer = Completer();
   HttpServer.bind("127.0.0.1", 0).then((server) {
     server.autoCompress = true;
     server.listen((request) {
       request.response.add(data);
       request.response.close();
     });
-    var client = new HttpClient();
+    var client = HttpClient();
     client.autoUncompress = clientAutoUncompress;
     client.get("127.0.0.1", server.port, "/").then((request) {
       request.headers.set(HttpHeaders.ACCEPT_ENCODING, "gzip,deflate");
@@ -43,13 +43,13 @@ Future<Null> testWithData(List<int> data, {bool clientAutoUncompress: true}) {
   return completer.future;
 }
 
-Future<Null> testRawServerCompressData({bool clientAutoUncompress: true}) {
+Future<Null> testRawServerCompressData({bool clientAutoUncompress = true}) {
   return testWithData("My raw server provided data".codeUnits,
       clientAutoUncompress: clientAutoUncompress);
 }
 
-Future<Null> testServerCompressLong({bool clientAutoUncompress: true}) {
-  var longBuffer = new Uint8List(1024 * 1024);
+Future<Null> testServerCompressLong({bool clientAutoUncompress = true}) {
+  var longBuffer = Uint8List(1024 * 1024);
   for (int i = 0; i < longBuffer.length; i++) {
     longBuffer[i] = i & 0xFF;
   }
@@ -68,14 +68,14 @@ void testServerCompress() {
 }
 
 Future<Null> acceptEncodingHeaderHelper(String encoding, bool valid) {
-  Completer<Null> completer = new Completer();
+  Completer<Null> completer = Completer();
   HttpServer.bind("127.0.0.1", 0).then((server) {
     server.autoCompress = true;
     server.listen((request) {
       request.response.write("data");
       request.response.close();
     });
-    var client = new HttpClient();
+    var client = HttpClient();
     client.get("127.0.0.1", server.port, "/").then((request) {
       request.headers.set(HttpHeaders.ACCEPT_ENCODING, encoding);
       return request.close();
@@ -122,7 +122,7 @@ void testAcceptEncodingHeader() {
 }
 
 Future<Null> testDisableCompressTest() {
-  Completer<Null> completer = new Completer();
+  Completer<Null> completer = Completer();
   HttpServer.bind("127.0.0.1", 0).then((server) {
     expect(false, equals(server.autoCompress));
     server.listen((request) {
@@ -131,7 +131,7 @@ Future<Null> testDisableCompressTest() {
       request.response.write("data");
       request.response.close();
     });
-    var client = new HttpClient();
+    var client = HttpClient();
     client
         .get("127.0.0.1", server.port, "/")
         .then((request) => request.close())

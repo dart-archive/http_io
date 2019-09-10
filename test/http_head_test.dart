@@ -8,7 +8,7 @@ import 'package:http_io/http_io.dart';
 import 'package:test/test.dart';
 
 Future<Null> testHEAD(int totalConnections) {
-  final completer = new Completer<Null>();
+  final completer = Completer<Null>();
   HttpServer.bind("127.0.0.1", 0).then((server) async {
     server.listen((request) {
       var response = request.response;
@@ -17,15 +17,15 @@ Future<Null> testHEAD(int totalConnections) {
         response.close();
       } else if (request.uri.path == "/test200") {
         response.contentLength = 200;
-        List<int> data = new List<int>.filled(200, 0);
+        List<int> data = List<int>.filled(200, 0);
         response.add(data);
         response.close();
       } else if (request.uri.path == "/testChunked100") {
-        List<int> data = new List<int>.filled(100, 0);
+        List<int> data = List<int>.filled(100, 0);
         response.add(data);
         response.close();
       } else if (request.uri.path == "/testChunked200") {
-        List<int> data = new List<int>.filled(200, 0);
+        List<int> data = List<int>.filled(200, 0);
         response.add(data);
         response.close();
       } else {
@@ -33,7 +33,7 @@ Future<Null> testHEAD(int totalConnections) {
       }
     });
 
-    HttpClient client = new HttpClient();
+    HttpClient client = HttpClient();
 
     int count = 0;
 

@@ -42,7 +42,7 @@ Future<HttpServer> makeServer() {
 Future<void> runClientProcess(int port) {
   var script =
       "${Directory.current.path}/test/http_client_stays_alive_test.dart";
-  if (!(new File(script)).existsSync()) {
+  if (!(File(script)).existsSync()) {
     // If we can't find the file relative to the cwd, then look relative to
     // Platform.script.
     script = Platform.script
@@ -70,7 +70,7 @@ Future<void> runClientProcess(int port) {
 }
 
 void runClient(int port) {
-  var client = new HttpClient();
+  var client = HttpClient();
   client
       .get('127.0.0.1', port, "/")
       .then((request) => request.close())

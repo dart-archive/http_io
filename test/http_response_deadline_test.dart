@@ -9,7 +9,7 @@ import 'package:http_io/http_io.dart';
 import 'package:test/test.dart';
 
 Future<Null> testSimpleDeadline(int connections) {
-  final completer = new Completer<Null>();
+  final completer = Completer<Null>();
   HttpServer.bind('localhost', 0).then((server) {
     server.listen((request) {
       request.response.deadline = const Duration(seconds: 1000);
@@ -18,7 +18,7 @@ Future<Null> testSimpleDeadline(int connections) {
     });
 
     var futures = <Future>[];
-    var client = new HttpClient();
+    var client = HttpClient();
     for (int i = 0; i < connections; i++) {
       futures.add(client
           .get('localhost', server.port, '/')
@@ -34,7 +34,7 @@ Future<Null> testSimpleDeadline(int connections) {
 }
 
 Future<Null> testExceedDeadline(int connections) {
-  final completer = new Completer<Null>();
+  final completer = Completer<Null>();
   HttpServer.bind('localhost', 0).then((server) {
     server.listen((request) {
       request.response.deadline = const Duration(milliseconds: 100);
@@ -43,7 +43,7 @@ Future<Null> testExceedDeadline(int connections) {
     });
 
     var futures = <Future>[];
-    var client = new HttpClient();
+    var client = HttpClient();
     for (int i = 0; i < connections; i++) {
       futures.add(client
           .get('localhost', server.port, '/')
@@ -64,14 +64,14 @@ Future<Null> testExceedDeadline(int connections) {
 }
 
 Future<Null> testDeadlineAndDetach(int connections) {
-  final completer = new Completer<Null>();
+  final completer = Completer<Null>();
   HttpServer.bind('localhost', 0).then((server) {
     server.listen((request) {
       request.response.deadline = const Duration(milliseconds: 0);
       request.response.contentLength = 5;
       request.response.persistentConnection = false;
       request.response.detachSocket().then((socket) {
-        new Timer(const Duration(milliseconds: 100), () {
+        Timer(const Duration(milliseconds: 100), () {
           socket.write('stuff');
           socket.close();
           socket.listen(null);
@@ -80,17 +80,16 @@ Future<Null> testDeadlineAndDetach(int connections) {
     });
 
     var futures = <Future>[];
-    var client = new HttpClient();
+    var client = HttpClient();
     for (int i = 0; i < connections; i++) {
       futures.add(client
           .get('localhost', server.port, '/')
           .then((request) => request.close())
           .then((response) {
         return response
-            .fold(new BytesBuilder(), (b, d) => b..add(d))
+            .fold(BytesBuilder(), (b, d) => b..add(d))
             .then((builder) {
-          expect(
-              'stuff', equals(new String.fromCharCodes(builder.takeBytes())));
+          expect('stuff', equals(String.fromCharCodes(builder.takeBytes())));
         });
       }));
     }

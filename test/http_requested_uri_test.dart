@@ -11,14 +11,14 @@ const sendPath = '/path?a=b#c';
 const expectedPath = '/path?a=b';
 
 Future<Null> runTest(String expected, Map headers) {
-  final completer = new Completer<Null>();
+  final completer = Completer<Null>();
   HttpServer.bind("localhost", 0).then((server) {
     expected = expected.replaceAll('%PORT', server.port.toString());
     server.listen((request) {
       expect("$expected$expectedPath", equals(request.requestedUri.toString()));
       request.response.close();
     });
-    HttpClient client = new HttpClient();
+    HttpClient client = HttpClient();
     client
         .get("localhost", server.port, sendPath)
         .then((request) {

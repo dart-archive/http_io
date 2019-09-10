@@ -60,15 +60,13 @@ class _MessageType {
   static const int RESPONSE = 0;
 }
 
-/**
- * The _HttpDetachedStreamSubscription takes a subscription and some extra data,
- * and makes it possible to "inject" the data in from of other data events
- * from the subscription.
- *
- * It does so by overriding pause/resume, so that once the
- * _HttpDetachedStreamSubscription is resumed, it'll deliver the data before
- * resuming the underlaying subscription.
- */
+/// The _HttpDetachedStreamSubscription takes a subscription and some extra data,
+/// and makes it possible to "inject" the data in from of other data events
+/// from the subscription.
+///
+/// It does so by overriding pause/resume, so that once the
+/// _HttpDetachedStreamSubscription is resumed, it'll deliver the data before
+/// resuming the underlaying subscription.
 class _HttpDetachedStreamSubscription implements StreamSubscription<Uint8List> {
   final StreamSubscription<Uint8List> _subscription;
   Uint8List _injectData;
@@ -159,37 +157,34 @@ class HttpDetachedIncoming extends Stream<Uint8List> {
       if (bufferedData == null) {
         return subscription..resume();
       }
-      return new _HttpDetachedStreamSubscription(
-          subscription, bufferedData, onData)
+      return _HttpDetachedStreamSubscription(subscription, bufferedData, onData)
         ..resume();
     } else {
       // TODO(26379): add test for this branch.
-      return new Stream<Uint8List>.fromIterable([bufferedData]).listen(onData,
+      return Stream<Uint8List>.fromIterable([bufferedData]).listen(onData,
           onError: onError, onDone: onDone, cancelOnError: cancelOnError);
     }
   }
 }
 
-/**
- * HTTP parser which parses the data stream given to consume.
- *
- * If an HTTP parser error occurs, the parser will signal an error to either
- * the current _HttpIncoming or the _parser itself.
- *
- * The connection upgrades (e.g. switching from HTTP/1.1 to the
- * WebSocket protocol) is handled in a special way. If connection
- * upgrade is specified in the headers, then on the callback to
- * [:responseStart:] the [:upgrade:] property on the [:HttpParser:]
- * object will be [:true:] indicating that from now on the protocol is
- * not HTTP anymore and no more callbacks will happen, that is
- * [:dataReceived:] and [:dataEnd:] are not called in this case as
- * there is no more HTTP data. After the upgrade the method
- * [:readUnparsedData:] can be used to read any remaining bytes in the
- * HTTP parser which are part of the protocol the connection is
- * upgrading to. These bytes cannot be processed by the HTTP parser
- * and should be handled according to whatever protocol is being
- * upgraded to.
- */
+/// HTTP parser which parses the data stream given to consume.
+///
+/// If an HTTP parser error occurs, the parser will signal an error to either
+/// the current _HttpIncoming or the _parser itself.
+///
+/// The connection upgrades (e.g. switching from HTTP/1.1 to the
+/// WebSocket protocol) is handled in a special way. If connection
+/// upgrade is specified in the headers, then on the callback to
+/// [:responseStart:] the [:upgrade:] property on the [:HttpParser:]
+/// object will be [:true:] indicating that from now on the protocol is
+/// not HTTP anymore and no more callbacks will happen, that is
+/// [:dataReceived:] and [:dataEnd:] are not called in this case as
+/// there is no more HTTP data. After the upgrade the method
+/// [:readUnparsedData:] can be used to read any remaining bytes in the
+/// HTTP parser which are part of the protocol the connection is
+/// upgrading to. These bytes cannot be processed by the HTTP parser
+/// and should be handled according to whatever protocol is being
+/// upgraded to.
 class HttpParser extends Stream<HttpIncoming> {
   // State.
   bool _parserCalled = false;
@@ -229,15 +224,15 @@ class HttpParser extends Stream<HttpIncoming> {
   StreamController<Uint8List> _bodyController;
 
   factory HttpParser.requestParser() {
-    return new HttpParser._(true);
+    return HttpParser._(true);
   }
 
   factory HttpParser.responseParser() {
-    return new HttpParser._(false);
+    return HttpParser._(false);
   }
 
   HttpParser._(this._requestParser) {
-    _controller = new StreamController<HttpIncoming>(
+    _controller = StreamController<HttpIncoming>(
         sync: true,
         onListen: () {
           _paused = false;
@@ -308,12 +303,11 @@ class HttpParser extends Stream<HttpIncoming> {
     }
     _createIncoming(_transferLength);
     if (_requestParser) {
-      _incoming.method = new String.fromCharCodes(_method);
-      _incoming.uri =
-          Uri.parse(new String.fromCharCodes(_uri_or_reason_phrase));
+      _incoming.method = String.fromCharCodes(_method);
+      _incoming.uri = Uri.parse(String.fromCharCodes(_uri_or_reason_phrase));
     } else {
       _incoming.statusCode = _statusCode;
-      _incoming.reasonPhrase = new String.fromCharCodes(_uri_or_reason_phrase);
+      _incoming.reasonPhrase = String.fromCharCodes(_uri_or_reason_phrase);
     }
     _method.clear();
     _uri_or_reason_phrase.clear();
@@ -361,10 +355,10 @@ class HttpParser extends Stream<HttpIncoming> {
     assert(!_parserCalled);
     _parserCalled = true;
     if (_state == _State.CLOSED) {
-      throw new HttpException("Data on closed connection");
+      throw HttpException("Data on closed connection");
     }
     if (_state == _State.FAILURE) {
-      throw new HttpException("Data on failed connection");
+      throw HttpException("Data on failed connection");
     }
     while (_buffer != null &&
         _index < _buffer.length &&
@@ -386,11 +380,11 @@ class HttpParser extends Stream<HttpIncoming> {
           } else {
             // Start parsing method.
             if (!CharCode.isTokenChar(byte)) {
-              throw new HttpException("Invalid request method");
+              throw HttpException("Invalid request method");
             }
             _method.add(byte);
             if (!_requestParser) {
-              throw new HttpException("Invalid response line");
+              throw HttpException("Invalid response line");
             }
             _state = _State.REQUEST_LINE_METHOD;
           }
@@ -407,7 +401,7 @@ class HttpParser extends Stream<HttpIncoming> {
             // method anymore.
             _httpVersionIndex++;
             if (_requestParser) {
-              throw new HttpException("Invalid request line");
+              throw HttpException("Invalid request line");
             }
             _state = _State.RESPONSE_HTTP_VERSION;
           } else {
@@ -421,7 +415,7 @@ class HttpParser extends Stream<HttpIncoming> {
               _method.add(byte);
               _httpVersion = _HttpVersion.UNDETERMINED;
               if (!_requestParser) {
-                throw new HttpException("Invalid response line");
+                throw HttpException("Invalid response line");
               }
               _state = _State.REQUEST_LINE_METHOD;
             }
@@ -450,7 +444,7 @@ class HttpParser extends Stream<HttpIncoming> {
             // HTTP version parsed.
             _state = _State.RESPONSE_LINE_STATUS_CODE;
           } else {
-            throw new HttpException("Invalid response line");
+            throw HttpException("Invalid response line");
           }
           break;
 
@@ -461,7 +455,7 @@ class HttpParser extends Stream<HttpIncoming> {
             if (Const.SEPARATOR_MAP[byte] ||
                 byte == CharCode.CR ||
                 byte == CharCode.LF) {
-              throw new HttpException("Invalid request method");
+              throw HttpException("Invalid request method");
             }
             _method.add(byte);
           }
@@ -470,13 +464,13 @@ class HttpParser extends Stream<HttpIncoming> {
         case _State.REQUEST_LINE_URI:
           if (byte == CharCode.SP) {
             if (_uri_or_reason_phrase.isEmpty) {
-              throw new HttpException("Invalid request URI");
+              throw HttpException("Invalid request URI");
             }
             _state = _State.REQUEST_LINE_HTTP_VERSION;
             _httpVersionIndex = 0;
           } else {
             if (byte == CharCode.CR || byte == CharCode.LF) {
-              throw new HttpException("Invalid request URI");
+              throw HttpException("Invalid request URI");
             }
             _uri_or_reason_phrase.add(byte);
           }
@@ -498,7 +492,7 @@ class HttpParser extends Stream<HttpIncoming> {
               _persistentConnection = false;
               _httpVersionIndex++;
             } else {
-              throw new HttpException("Invalid response line");
+              throw HttpException("Invalid response line");
             }
           } else {
             if (byte == CharCode.CR) {
@@ -527,7 +521,7 @@ class HttpParser extends Stream<HttpIncoming> {
           } else {
             _statusCodeLength++;
             if ((byte < 0x30 && 0x39 < byte) || _statusCodeLength > 3) {
-              throw new HttpException("Invalid response status code");
+              throw HttpException("Invalid response status code");
             } else {
               _statusCode = _statusCode * 10 + byte - 0x30;
             }
@@ -539,7 +533,7 @@ class HttpParser extends Stream<HttpIncoming> {
             _state = _State.RESPONSE_LINE_ENDING;
           } else {
             if (byte == CharCode.CR || byte == CharCode.LF) {
-              throw new HttpException("Invalid response reason phrase");
+              throw HttpException("Invalid response reason phrase");
             }
             _uri_or_reason_phrase.add(byte);
           }
@@ -551,7 +545,7 @@ class HttpParser extends Stream<HttpIncoming> {
           // ignore: unnecessary_statements
           _messageType == _MessageType.RESPONSE;
           if (_statusCode < 100 || _statusCode > 599) {
-            throw new HttpException("Invalid response status code");
+            throw HttpException("Invalid response status code");
           } else {
             // Check whether this response will never have a body.
             if (_statusCode <= 199 ||
@@ -564,7 +558,7 @@ class HttpParser extends Stream<HttpIncoming> {
           break;
 
         case _State.HEADER_START:
-          _headers = new HttpHeadersImpl(version);
+          _headers = HttpHeadersImpl(version);
           if (byte == CharCode.CR) {
             _state = _State.HEADER_ENDING;
           } else if (byte == CharCode.LF) {
@@ -582,7 +576,7 @@ class HttpParser extends Stream<HttpIncoming> {
             _state = _State.HEADER_VALUE_START;
           } else {
             if (!CharCode.isTokenChar(byte)) {
-              throw new HttpException("Invalid header field name");
+              throw HttpException("Invalid header field name");
             }
             _headerField.add(_toLowerCaseByte(byte));
           }
@@ -619,8 +613,8 @@ class HttpParser extends Stream<HttpIncoming> {
           if (byte == CharCode.SP || byte == CharCode.HT) {
             _state = _State.HEADER_VALUE_START;
           } else {
-            String headerField = new String.fromCharCodes(_headerField);
-            String headerValue = new String.fromCharCodes(_headerValue);
+            String headerField = String.fromCharCodes(_headerField);
+            String headerValue = String.fromCharCodes(_headerValue);
             if (headerField == "transfer-encoding" &&
                 _caseInsensitiveCompare("chunked".codeUnits, _headerValue)) {
               _chunked = true;
@@ -725,7 +719,7 @@ class HttpParser extends Stream<HttpIncoming> {
           // Always present the data as a view. This way we can handle all
           // cases like this, and the user will not experience different data
           // typed (which could lead to polymorphic user code).
-          Uint8List data = new Uint8List.view(
+          Uint8List data = Uint8List.view(
               _buffer.buffer, _buffer.offsetInBytes + _index, dataAvailable);
           _bodyController.add(data);
           if (_remainingContent != -1) {
@@ -782,8 +776,8 @@ class HttpParser extends Stream<HttpIncoming> {
       if (_state != _State.UPGRADED &&
           !(_state == _State.START && !_requestParser) &&
           !(_state == _State.BODY && !_chunked && _transferLength == -1)) {
-        _bodyController.addError(
-            new HttpException("Connection closed while receiving data"));
+        _bodyController
+            .addError(HttpException("Connection closed while receiving data"));
       }
       _closeIncoming(true);
       _controller.close();
@@ -792,8 +786,8 @@ class HttpParser extends Stream<HttpIncoming> {
     // If the connection is idle the HTTP stream is closed.
     if (_state == _State.START) {
       if (!_requestParser) {
-        _reportError(new HttpException(
-            "Connection closed before full header was received"));
+        _reportError(
+            HttpException("Connection closed before full header was received"));
       }
       _controller.close();
       return;
@@ -808,8 +802,8 @@ class HttpParser extends Stream<HttpIncoming> {
       _state = _State.FAILURE;
       // Report the error through the error callback if any. Otherwise
       // throw the error.
-      _reportError(new HttpException(
-          "Connection closed before full header was received"));
+      _reportError(
+          HttpException("Connection closed before full header was received"));
       _controller.close();
       return;
     }
@@ -821,7 +815,7 @@ class HttpParser extends Stream<HttpIncoming> {
       // Report the error through the error callback if any. Otherwise
       // throw the error.
       _reportError(
-          new HttpException("Connection closed before full body was received"));
+          HttpException("Connection closed before full body was received"));
     }
     _controller.close();
   }
@@ -841,14 +835,14 @@ class HttpParser extends Stream<HttpIncoming> {
   bool get upgrade => _connectionUpgrade && _state == _State.UPGRADED;
   bool get persistentConnection => _persistentConnection;
 
-  void set isHead(bool value) {
+  set isHead(bool value) {
     if (value) _noMessageBody = true;
   }
 
   HttpDetachedIncoming detachIncoming() {
     // Simulate detached by marking as upgraded.
     _state = _State.UPGRADED;
-    return new HttpDetachedIncoming(_socketSubscription, readUnparsedData());
+    return HttpDetachedIncoming(_socketSubscription, readUnparsedData());
   }
 
   Uint8List readUnparsedData() {
@@ -889,7 +883,7 @@ class HttpParser extends Stream<HttpIncoming> {
   }
 
   static List<String> _tokenizeFieldValue(String headerValue) {
-    List<String> tokens = new List<String>();
+    List<String> tokens = List<String>();
     int start = 0;
     int index = 0;
     while (index < headerValue.length) {
@@ -925,7 +919,7 @@ class HttpParser extends Stream<HttpIncoming> {
 
   void _expect(int val1, int val2) {
     if (val1 != val2) {
-      throw new HttpException("Failed to parse HTTP");
+      throw HttpException("Failed to parse HTTP");
     }
   }
 
@@ -937,7 +931,7 @@ class HttpParser extends Stream<HttpIncoming> {
     } else if (0x61 <= byte && byte <= 0x66) {
       return byte - 0x61 + 10; // a - f
     } else {
-      throw new HttpException("Failed to parse HTTP");
+      throw HttpException("Failed to parse HTTP");
     }
   }
 
@@ -946,7 +940,7 @@ class HttpParser extends Stream<HttpIncoming> {
     assert(_bodyController == null);
     assert(!_bodyPaused);
     HttpIncoming incoming;
-    _bodyController = new StreamController<Uint8List>(
+    _bodyController = StreamController<Uint8List>(
         sync: true,
         onListen: () {
           if (incoming != _incoming) return;
@@ -975,7 +969,7 @@ class HttpParser extends Stream<HttpIncoming> {
           _controller.close();
         });
     incoming = _incoming =
-        new HttpIncoming(_headers, transferLength, _bodyController.stream);
+        HttpIncoming(_headers, transferLength, _bodyController.stream);
     _bodyPaused = true;
     _pauseStateChanged();
   }

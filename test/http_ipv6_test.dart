@@ -11,7 +11,7 @@ import 'package:test/test.dart';
 // server sets a content length but still needs to close the
 // connection as there is no keep alive.
 Future<Null> testHttpIPv6() {
-  final completer = new Completer<Null>();
+  final completer = Completer<Null>();
   HttpServer.bind("::", 0).then((server) {
     server.listen((HttpRequest request) {
       expect(request.headers["host"][0], equals("[::1]:${server.port}"));
@@ -19,7 +19,7 @@ Future<Null> testHttpIPv6() {
       request.response.close();
     });
 
-    var client = new HttpClient();
+    var client = HttpClient();
     var url = Uri.parse('http://[::1]:${server.port}/xxx');
     expect(url.host, equals('::1'));
     client

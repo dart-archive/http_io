@@ -27,17 +27,17 @@ Future<String> _connectGetSession(HttpClient client, int port,
   var request = await client.get("127.0.0.1", port, "/");
 
   if (session != null) {
-    request.cookies.add(new Cookie(_sessionId, session));
+    request.cookies.add(Cookie(_sessionId, session));
   }
   var response = await request.close();
   return response.fold(_getSessionId(response.cookies), (v, _) => v);
 }
 
 Future _testSessions(int sessionCount) async {
-  var client = new HttpClient();
+  var client = HttpClient();
 
   var server = await HttpServer.bind("127.0.0.1", 0);
-  var sessions = new Set();
+  var sessions = Set();
   server.listen((request) {
     sessions.add(request.session.id);
     request.response.close();
@@ -63,12 +63,12 @@ Future _testSessions(int sessionCount) async {
 }
 
 Future _testTimeout(int sessionCount) async {
-  var client = new HttpClient();
+  var client = HttpClient();
   var server = await HttpServer.bind("127.0.0.1", 0);
   server.sessionTimeout = 1;
   var timeouts = <Future>[];
   server.listen((request) {
-    var c = new Completer();
+    var c = Completer();
     timeouts.add(c.future);
     request.session.onTimeout = () {
       c.complete(null);
@@ -117,7 +117,7 @@ Future _testSessionsData() async {
     request.response.close();
   });
 
-  var client = new HttpClient();
+  var client = HttpClient();
   var request = await client.get("127.0.0.1", server.port, "/");
 
   var response = await request.close();
@@ -128,7 +128,7 @@ Future _testSessionsData() async {
   expect(id, isNotNull);
 
   request = await client.get("127.0.0.1", server.port, "/");
-  request.cookies.add(new Cookie(_sessionId, id));
+  request.cookies.add(Cookie(_sessionId, id));
 
   response = await request.close();
 
@@ -158,7 +158,7 @@ Future _testSessionsDestroy() async {
     request.response.close();
   });
 
-  var client = new HttpClient();
+  var client = HttpClient();
   var request = await client.get("127.0.0.1", server.port, "/");
 
   var response = await request.close();
@@ -170,7 +170,7 @@ Future _testSessionsDestroy() async {
 
   request = await client.get("127.0.0.1", server.port, "/");
 
-  request.cookies.add(new Cookie(_sessionId, id));
+  request.cookies.add(Cookie(_sessionId, id));
   response = await request.close();
 
   await response.drain();

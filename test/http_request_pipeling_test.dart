@@ -9,7 +9,7 @@ import 'package:http_io/http_io.dart';
 import 'package:test/test.dart';
 
 Future<Null> requestPipeling() {
-  final completer = new Completer<Null>();
+  final completer = Completer<Null>();
   final int REQUEST_COUNT = 100;
   int count = 0;
   HttpServer.bind("127.0.0.1", 0).then((server) {

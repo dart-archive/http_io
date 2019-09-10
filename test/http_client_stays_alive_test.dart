@@ -30,7 +30,7 @@ List<String> packageOptions() {
 }
 
 Future<Null> runServerProcess() {
-  Completer<Null> completer = new Completer();
+  Completer<Null> completer = Completer();
   HttpServer.bind('127.0.0.1', 0).then((server) {
     var url = 'http://127.0.0.1:${server.port}/';
 
@@ -42,10 +42,10 @@ Future<Null> runServerProcess() {
         ..close();
     });
 
-    var sw = new Stopwatch()..start();
+    var sw = Stopwatch()..start();
     var script =
         "${Directory.current.path}/test/http_client_stays_alive_test.dart";
-    if (!(new File(script)).existsSync()) {
+    if (!(File(script)).existsSync()) {
       // If we can't find the file relative to the cwd, then look relative to
       // Platform.script.
       script = Platform.script
@@ -81,7 +81,7 @@ runClientProcess(String url) {
 
   // NOTE: We make an HTTP client request and then *forget to close* the HTTP
   // client instance. The idle timer should fire after SECONDS.
-  var client = new HttpClient();
+  var client = HttpClient();
   client.idleTimeout = const Duration(seconds: SECONDS);
 
   client

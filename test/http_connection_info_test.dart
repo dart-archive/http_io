@@ -8,7 +8,7 @@ import "package:http_io/http_io.dart";
 import "package:test/test.dart";
 
 Future<Null> testHttpConnectionInfo() {
-  final completer = new Completer<Null>();
+  final completer = Completer<Null>();
   HttpServer.bind("0.0.0.0", 0).then((server) {
     int clientPort;
 
@@ -26,7 +26,7 @@ Future<Null> testHttpConnectionInfo() {
       });
     });
 
-    HttpClient client = new HttpClient();
+    HttpClient client = HttpClient();
     client.get("127.0.0.1", server.port, "/").then((request) {
       expect(request.connectionInfo.remoteAddress is InternetAddress, isTrue);
       expect(request.connectionInfo.remotePort, equals(server.port));

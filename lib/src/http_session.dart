@@ -3,24 +3,16 @@
 // BSD-style license that can be found in the LICENSE file.
 
 abstract class HttpSession implements Map {
-  /**
-   * Gets the id for the current session.
-   */
+  /// Gets the id for the current session.
   String get id;
 
-  /**
-   * Destroys the session. This will terminate the session and any further
-   * connections with this id will be given a new id and session.
-   */
+  /// Destroys the session. This will terminate the session and any further
+  /// connections with this id will be given a new id and session.
   void destroy();
 
-  /**
-   * Sets a callback that will be called when the session is timed out.
-   */
-  void set onTimeout(void callback());
+  /// Sets a callback that will be called when the session is timed out.
+  set onTimeout(void callback());
 
-  /**
-   * Is true if the session has not been sent to the client yet.
-   */
+  /// Is true if the session has not been sent to the client yet.
   bool get isNew;
 }

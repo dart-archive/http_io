@@ -44,7 +44,7 @@ void checkExpectedConnectionHeaders(
 }
 
 Future<Null> headerTest(int totalConnections, bool clientPersistentConnection) {
-  final completer = new Completer<Null>();
+  final completer = Completer<Null>();
   HttpServer.bind("127.0.0.1", 0).then((server) {
     server.listen((HttpRequest request) {
       // Check expected request.
@@ -64,7 +64,7 @@ Future<Null> headerTest(int totalConnections, bool clientPersistentConnection) {
     });
 
     int count = 0;
-    HttpClient client = new HttpClient();
+    HttpClient client = HttpClient();
     for (int i = 0; i < totalConnections; i++) {
       client
           .get("127.0.0.1", server.port, "/")
