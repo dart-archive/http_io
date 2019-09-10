@@ -10,7 +10,7 @@ import 'http_headers_impl.dart';
 class HttpIncoming extends Stream<List<int>> {
   final int _transferLength;
   final _dataCompleter = new Completer<bool>();
-  Stream<List<int>> _stream;
+  final Stream<List<int>> _stream;
 
   bool fullBodyRead = false;
 

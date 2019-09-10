@@ -19,7 +19,7 @@ class HttpSessionImpl implements HttpSession {
   bool _isNew = true;
   DateTime _lastSeen;
   Function _timeoutCallback;
-  HttpSessionManager _sessionManager;
+  final HttpSessionManager _sessionManager;
   // Pointers in timeout queue.
   HttpSessionImpl _prev;
   HttpSessionImpl _next;
@@ -110,7 +110,7 @@ class HttpSessionImpl implements HttpSession {
 //  * In a map, mapping from ID to HttpSession.
 //  * In a linked list, used as a timeout queue.
 class HttpSessionManager {
-  Map<String, HttpSessionImpl> _sessions;
+  final Map<String, HttpSessionImpl> _sessions;
   int _sessionTimeout = 20 * 60; // 20 mins.
   HttpSessionImpl _head;
   HttpSessionImpl _tail;

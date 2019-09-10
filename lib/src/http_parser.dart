@@ -70,7 +70,7 @@ class _MessageType {
  * resuming the underlaying subscription.
  */
 class _HttpDetachedStreamSubscription implements StreamSubscription<Uint8List> {
-  StreamSubscription<Uint8List> _subscription;
+  final StreamSubscription<Uint8List> _subscription;
   Uint8List _injectData;
   bool _isCanceled = false;
   int _pauseCount = 1;

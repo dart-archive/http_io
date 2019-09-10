@@ -51,7 +51,7 @@ class IsolatedHttpServer {
     _statusPort.close();
   }
 
-  ReceivePort _statusPort; // Port for receiving messages from the server.
+  final ReceivePort _statusPort; // Port for receiving messages from the server.
   SendPort _serverPort; // Port for sending messages to the server.
   void Function(int) _startedCallback;
 }
@@ -69,7 +69,7 @@ class IsolatedHttpServerCommand {
   bool get isStop => _command == STOP;
   bool get isChunkedEncoding => _command == CHUNKED_ENCODING;
 
-  int _command;
+  final int _command;
 }
 
 class IsolatedHttpServerStatus {
@@ -77,18 +77,22 @@ class IsolatedHttpServerStatus {
   static const STOPPED = 1;
   static const ERROR = 2;
 
-  IsolatedHttpServerStatus.started(this._port) : _state = STARTED;
-  IsolatedHttpServerStatus.stopped() : _state = STOPPED;
-  IsolatedHttpServerStatus.error() : _state = ERROR;
+  IsolatedHttpServerStatus.started(this.port) : _state = STARTED;
+
+  IsolatedHttpServerStatus.stopped()
+      : port = null,
+        _state = STOPPED;
+
+  IsolatedHttpServerStatus.error()
+      : port = null,
+        _state = ERROR;
 
   bool get isStarted => _state == STARTED;
   bool get isStopped => _state == STOPPED;
   bool get isError => _state == ERROR;
 
-  int get port => _port;
-
-  int _state;
-  int _port;
+  final int _state;
+  final int port;
 }
 
 void startIsolatedHttpServer(Object replyToObj) {

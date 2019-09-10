@@ -84,9 +84,8 @@ class HttpDate {
    *     Thursday, 1-Jan-1970 00:00:00 GMT
    *     Thu Jan  1 00:00:00 1970
    *
-   * For more information see [RFC-2616 section
-   * 3.1.1](http://tools.ietf.org/html/rfc2616#section-3.3.1
-   * "RFC-2616 section 3.1.1").
+   * For more information see
+   * [RFC-2616 section 3.1.1](https://tools.ietf.org/html/rfc2616#section-3.3.1).
    */
   static DateTime parse(String date) {
     final int SP = 32;
