@@ -2764,10 +2764,6 @@ class _DetachedSocket extends Stream<Uint8List> implements Socket {
   void setRawOption(RawSocketOption option) {
     _socket.setRawOption(option);
   }
-
-  Map _toJSON(bool ref) {
-    return (_socket as dynamic)._toJSON(ref);
-  }
 }
 
 class _AuthenticationScheme {
