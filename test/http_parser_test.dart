@@ -293,7 +293,7 @@ class HttpParserTest {
     testWrite(responseData, 1);
   }
 
-  static void _testParseInvalidResponse(String response, [bool close = false]) {
+  static void _testParseInvalidResponse(String response) {
     void testWrite(Uint8List requestData, [int chunkSize = -1]) {
       HttpParser httpParser = HttpParser.responseParser();
       StreamController<Uint8List> controller = StreamController(sync: true);
