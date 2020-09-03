@@ -165,7 +165,9 @@ class _HttpRequest extends _HttpInboundMessage implements HttpRequest {
       var proto = headers['x-forwarded-proto'];
       var scheme = proto != null
           ? proto.first
-          : _httpConnection._socket is SecureSocket ? "https" : "http";
+          : _httpConnection._socket is SecureSocket
+              ? "https"
+              : "http";
       var hostList = headers['x-forwarded-host'];
       String host;
       if (hostList != null) {
