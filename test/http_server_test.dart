@@ -168,7 +168,7 @@ Future<Null> testHttpServerZone() {
 Future<Null> testHttpServerZoneError() {
   Completer<Null> completer = Completer();
   Zone parent = Zone.current;
-  runZoned(() {
+  runZonedGuarded(() {
     expect(parent, isNot(equals(Zone.current)));
     HttpServer.bind("127.0.0.1", 0).then((server) {
       expect(parent, isNot(equals(Zone.current)));
@@ -187,7 +187,7 @@ Future<Null> testHttpServerZoneError() {
         socket.listen(null);
       });
     });
-  }, onError: (e) {
+  }, (e, s) {
     completer.complete(null);
   });
   return completer.future;
@@ -196,7 +196,7 @@ Future<Null> testHttpServerZoneError() {
 Future<Null> testHttpServerClientClose() {
   Completer<Null> completer = Completer();
   HttpServer.bind("127.0.0.1", 0).then((server) {
-    runZoned(() {
+    runZonedGuarded(() {
       server.listen((request) {
         request.response.bufferOutput = false;
         request.response.add(Uint8List(64 * 1024));
@@ -207,7 +207,7 @@ Future<Null> testHttpServerClientClose() {
           });
         });
       });
-    }, onError: (e, s) {
+    }, (e, s) {
       fail("Unexpected error: $e(${e.hashCode})\n$s");
     });
     var client = HttpClient();

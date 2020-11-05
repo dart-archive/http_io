@@ -1,5 +1,4 @@
 language: dart
-sudo: true
 
 before_script:
   # Add an IPv6 config - see the corresponding Travis issue
@@ -9,7 +8,7 @@ before_script:
     fi
 
 dart:
-  - 2.5.0
+  - 2.8.4
   - dev
 
 dart_task:
