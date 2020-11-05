@@ -1,10 +1,11 @@
 name: http_io
-author: "Dart Team <misc@dartlang.org>"
-homepage: https://github.com/dart-lang/http_io
+repository: https://github.com/dart-lang/http_io
 description: HTTP Client and Server APIs.
 
+publish_to: none
+
 environment:
-  sdk: ">=2.5.0 <3.0.0"
+  sdk: ">=2.8.4 <3.0.0"
 
 dev_dependencies:
   convert: ^2.0.1
