@@ -43,7 +43,7 @@ Future<Null> testReusePort() {
   final completer = Completer<Null>();
   runServer(0, 10, true).then((int port) {
     // Stress test the port reusing it 10 times.
-    Future.forEach(List(10), (_) {
+    Future.forEach(Iterable.generate(10), (_) {
       return runServer(port, 10, true);
     }).then((_) {
       completer.complete();
@@ -56,7 +56,7 @@ Future<Null> testUncleanReusePort() {
   final completer = Completer<Null>();
   runServer(0, 10, false).then((int port) {
     // Stress test the port reusing it 10 times.
-    Future.forEach(List(10), (_) {
+    Future.forEach(Iterable.generate(10), (_) {
       return runServer(port, 10, false);
     }).then((_) {
       completer.complete();

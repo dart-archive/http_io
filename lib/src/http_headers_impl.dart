@@ -112,7 +112,7 @@ class HttpHeadersImpl implements HttpHeaders {
   }
 
   void noFolding(String name) {
-    _noFoldingHeaders ??= List<String>();
+    _noFoldingHeaders ??= <String>[];
     _noFoldingHeaders.add(name);
   }
 
@@ -432,7 +432,7 @@ class HttpHeadersImpl implements HttpHeaders {
   void _addValue(String name, Object value) {
     List<String> values = headers[name];
     if (values == null) {
-      values = List<String>();
+      values = <String>[];
       headers[name] = values;
     }
     if (value is DateTime) {
@@ -446,7 +446,7 @@ class HttpHeadersImpl implements HttpHeaders {
 
   void _set(String name, String value) {
     assert(name == _validateField(name));
-    List<String> values = List<String>();
+    List<String> values = <String>[];
     headers[name] = values;
     values.add(value);
   }
@@ -522,7 +522,7 @@ class HttpHeadersImpl implements HttpHeaders {
 
   List<Cookie> parseCookies() {
     // Parse a Cookie header value according to the rules in RFC 6265.
-    var cookies = List<Cookie>();
+    var cookies = <Cookie>[];
     void parseCookieString(String s) {
       int index = 0;
 

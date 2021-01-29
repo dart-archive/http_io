@@ -240,7 +240,7 @@ class _HttpClientResponse extends _HttpInboundMessage
 
   List<Cookie> get cookies {
     if (_cookies != null) return _cookies;
-    _cookies = List<Cookie>();
+    _cookies = <Cookie>[];
     List<String> values = headers[HttpHeaders.SET_COOKIE];
     if (values != null) {
       values.forEach((value) {
@@ -727,7 +727,7 @@ class _HttpResponse extends _HttpOutboundMessage<HttpResponse>
   bool get _isConnectionClosed => _httpRequest._httpConnection._isClosing;
 
   List<Cookie> get cookies {
-    _cookies ??= List<Cookie>();
+    _cookies ??= <Cookie>[];
     return _cookies;
   }
 
@@ -936,7 +936,7 @@ class _HttpClientRequest extends _HttpOutboundMessage<HttpClientResponse>
     implements HttpClientRequest {
   final String method;
   final Uri uri;
-  final List<Cookie> cookies = List<Cookie>();
+  final List<Cookie> cookies = <Cookie>[];
 
   // The HttpClient this request belongs to.
   final _HttpClient _httpClient;
@@ -2597,7 +2597,7 @@ class _ProxyConfiguration {
   static const String PROXY_PREFIX = "PROXY ";
   static const String DIRECT_PREFIX = "DIRECT";
 
-  _ProxyConfiguration(String configuration) : proxies = List<_Proxy>() {
+  _ProxyConfiguration(String configuration) : proxies = <_Proxy>[] {
     if (configuration == null) {
       throw HttpException("Invalid proxy configuration $configuration");
     }

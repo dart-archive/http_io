@@ -187,7 +187,7 @@ Future<Null> testRead(bool chunkedEncoding) {
         return request.close();
       }).then((response) {
         expect(HttpStatus.OK, equals(response.statusCode));
-        List<int> body = List<int>();
+        List<int> body = <int>[];
         response.listen(body.addAll, onDone: () {
           expect(data, equals(String.fromCharCodes(body)));
           count++;

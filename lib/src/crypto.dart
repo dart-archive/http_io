@@ -75,7 +75,7 @@ class CryptoUtils {
     if (addLineSeparator) {
       outputLen += ((outputLen - 1) ~/ LINE_LENGTH) << 1;
     }
-    List<int> out = List<int>(outputLen);
+    List<int> out = List<int>.filled(outputLen, null);
 
     // Encode 24 bit chunks.
     int j = 0, i = 0, c = 0;
@@ -119,7 +119,7 @@ class CryptoUtils {
       [bool ignoreInvalidCharacters = true]) {
     int len = input.length;
     if (len == 0) {
-      return List<int>(0);
+      return const <int>[];
     }
 
     // Count '\r', '\n' and illegal characters, For illegal characters,
@@ -148,7 +148,7 @@ class CryptoUtils {
       if (currentCodeUnit == PAD) padLength++;
     }
     int outputLen = (((len - extrasLen) * 6) >> 3) - padLength;
-    List<int> out = List<int>(outputLen);
+    List<int> out = List<int>.filled(outputLen, null);
 
     for (int i = 0, o = 0; o < outputLen;) {
       // Accumulate 4 valid 6 bit Base 64 characters into an int.
@@ -192,8 +192,8 @@ abstract class HashBase {
   HashBase(
       this._chunkSizeInWords, this._digestSizeInWords, this._bigEndianWords)
       : _pendingData = [] {
-    _currentChunk = List(_chunkSizeInWords);
-    _h = List(_digestSizeInWords);
+    _currentChunk = List.filled(_chunkSizeInWords, null);
+    _h = List.filled(_digestSizeInWords, null);
   }
 
   // Update the hasher with more data.
@@ -269,7 +269,7 @@ abstract class HashBase {
 
   // Convert a 32-bit word to four bytes.
   List<int> _wordToBytes(int word) {
-    List<int> bytes = List(_BYTES_PER_WORD);
+    List<int> bytes = List.filled(_BYTES_PER_WORD, null);
     bytes[0] = (word >> (_bigEndianWords ? 24 : 0)) & _MASK_8;
     bytes[1] = (word >> (_bigEndianWords ? 16 : 8)) & _MASK_8;
     bytes[2] = (word >> (_bigEndianWords ? 8 : 16)) & _MASK_8;
