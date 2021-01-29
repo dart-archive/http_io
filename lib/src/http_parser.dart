@@ -883,7 +883,7 @@ class HttpParser extends Stream<HttpIncoming> {
   }
 
   static List<String> _tokenizeFieldValue(String headerValue) {
-    List<String> tokens = List<String>();
+    List<String> tokens = <String>[];
     int start = 0;
     int index = 0;
     while (index < headerValue.length) {

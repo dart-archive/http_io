@@ -70,7 +70,7 @@ class EarlyCloseTest {
 }
 
 Future<Null> testEarlyClose1() async {
-  List<EarlyCloseTest> tests = List<EarlyCloseTest>();
+  List<EarlyCloseTest> tests = <EarlyCloseTest>[];
   void add(Object data, [String exception, bool expectRequest = false]) {
     tests.add(EarlyCloseTest(data, exception, expectRequest));
   }

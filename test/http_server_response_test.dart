@@ -51,7 +51,7 @@ void testServerRequest(void handler(server, request),
 }
 
 Future<List> testResponseDone() {
-  final completers = List<Future<Null>>();
+  final completers = <Future<Null>>[];
   final completer = Completer<Null>();
   testServerRequest((server, request) {
     request.response.close();
@@ -93,7 +93,7 @@ Future<List> testResponseDone() {
 Future<List> testResponseAddStream() {
   File file = scriptSource;
   int bytes = file.lengthSync();
-  final completers = List<Future<Null>>();
+  final completers = <Future<Null>>[];
   final completer = Completer<Null>();
   testServerRequest((server, request) {
     request.response.addStream(file.openRead()).then((response) {
@@ -197,7 +197,7 @@ Future<Null> testResponseAddStreamClosed() {
 
 Future<List> testResponseAddClosed() {
   File file = scriptSource;
-  final completers = List<Future<Null>>();
+  final completers = <Future<Null>>[];
 
   final completer = Completer<Null>();
   testServerRequest((server, request) {
@@ -249,7 +249,7 @@ Future<List> testResponseAddClosed() {
 }
 
 Future<List> testBadResponseAdd() {
-  final completers = List<Future<Null>>();
+  final completers = <Future<Null>>[];
   final completer = Completer<Null>();
   testServerRequest((server, request) {
     request.response.contentLength = 0;
@@ -292,7 +292,7 @@ Future<List> testBadResponseAdd() {
 }
 
 Future<List> testBadResponseClose() {
-  final completers = List<Future<Null>>();
+  final completers = <Future<Null>>[];
   final completer = Completer<Null>();
   testServerRequest((server, request) {
     request.response.contentLength = 5;
