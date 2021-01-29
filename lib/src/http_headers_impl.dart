@@ -432,7 +432,7 @@ class HttpHeadersImpl implements HttpHeaders {
   void _addValue(String name, Object value) {
     List<String> values = headers[name];
     if (values == null) {
-      values = List<String>.empty(growable: true);
+      values = <String>[];
       headers[name] = values;
     }
     if (value is DateTime) {

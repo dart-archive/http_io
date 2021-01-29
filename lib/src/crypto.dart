@@ -119,7 +119,7 @@ class CryptoUtils {
       [bool ignoreInvalidCharacters = true]) {
     int len = input.length;
     if (len == 0) {
-      return List<int>.empty();
+      return const <int>[];
     }
 
     // Count '\r', '\n' and illegal characters, For illegal characters,
