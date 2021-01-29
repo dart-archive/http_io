@@ -541,9 +541,7 @@ class HttpParser extends Stream<HttpIncoming> {
 
         case _State.RESPONSE_LINE_ENDING:
           _expect(byte, CharCode.LF);
-          // TODO(kevmoo): file a linter bug on this!
-          // ignore: unnecessary_statements
-          _messageType == _MessageType.RESPONSE;
+          _messageType = _MessageType.RESPONSE;
           if (_statusCode < 100 || _statusCode > 599) {
             throw HttpException("Invalid response status code");
           } else {
