@@ -1074,7 +1074,10 @@ class _HttpClientRequest extends _HttpOutboundMessage<HttpClientResponse>
       StringBuffer sb = StringBuffer();
       for (int i = 0; i < cookies.length; i++) {
         if (i > 0) sb.write("; ");
-        sb..write(cookies[i].name)..write("=")..write(cookies[i].value);
+        sb
+          ..write(cookies[i].name)
+          ..write("=")
+          ..write(cookies[i].value);
       }
       headers.add(HttpHeaders.COOKIE, sb.toString());
     }
@@ -2931,7 +2934,9 @@ class _HttpClientDigestCredentials extends _HttpClientCredentials
     String qop;
     String cnonce;
     String nc;
-    hasher = MD5()..add(credentials.ha1.codeUnits)..add([CharCode.COLON]);
+    hasher = MD5()
+      ..add(credentials.ha1.codeUnits)
+      ..add([CharCode.COLON]);
     if (credentials.qop == "auth") {
       qop = credentials.qop;
       cnonce = CryptoUtils.bytesToHex(CryptoUtils.getRandomBytes(4));
