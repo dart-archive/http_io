@@ -11,7 +11,9 @@ class HttpException implements IOException {
   const HttpException(this.message, {this.uri});
 
   String toString() {
-    var b = StringBuffer()..write('HttpException: ')..write(message);
+    var b = StringBuffer()
+      ..write('HttpException: ')
+      ..write(message);
     if (uri != null) {
       b.write(', uri = $uri');
     }
